@@ -1,0 +1,12 @@
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+scikit-optimize
+hyperopt
+optuna
+xgboost
+flask
+lightgbm
+requests

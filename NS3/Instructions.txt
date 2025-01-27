@@ -1,0 +1,326 @@
+ns3 installation video - https://www.youtube.com/watch?v=3U_sKkbSMjQ
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+COMMANDS
+
+1) first do:
+
+cd ~
+cd ns-allinone-3.43/ns-3.43
+
+2) to run : 
+
+./ns3 run real_mec
+
+3) to open explorer
+
+explorer.exe .
+
+4) To open file
+
+nano scratch/real_mec.cc
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+OLD DISTANCE GENERATION CODE :
+
+#include "ns3/core-module.h"
+#include "ns3/mobility-module.h"
+#include "ns3/network-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/propagation-module.h"
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+
+using namespace ns3;
+
+NS_LOG_COMPONENT_DEFINE("MecSimulation");
+
+// Path loss parameters
+const double referenceSignalStrength = -50.0; // Signal strength at reference distance (dB)
+const double pathLossExponent = 3.0; // Path loss exponent (can be adjusted based on environment)
+
+// Function to calculate distance based on signal strength (dB)
+double CalculateDistanceFromSignalStrength(double signalStrength) {
+    double distance = pow(10, (signalStrength - referenceSignalStrength) / (10 * pathLossExponent));
+    return distance;
+}
+
+// Function to normalize coordinates to range [0, 99]
+double NormalizeCoordinate(double value, double min, double max) {
+    return ((value - min) / (max - min)) * 99;
+}
+
+// Function to export coordinates to CSV
+void exportCoordinatesToCSV(std::vector<Ptr<Node>> nodes) {
+    std::ofstream outputFile("/mnt/c/Users/prith/OneDrive/Desktop/phase II/coordinates_normalized.csv");
+    if (!outputFile.is_open()) {
+        NS_LOG_ERROR("Failed to open output file for coordinates.");
+        return;
+    }
+
+    // Write the header to the CSV file
+    outputFile << "User_ID,X,Y\n";
+
+    for (size_t i = 0; i < nodes.size(); ++i) {
+        Ptr<Node> node = nodes[i];
+        Ptr<ConstantPositionMobilityModel> mobilityModel = node->GetObject<ConstantPositionMobilityModel>();
+        if (mobilityModel) {
+            Vector position = mobilityModel->GetPosition();
+            
+            // Normalize the X and Y coordinates
+            double normalizedX = NormalizeCoordinate(position.x, 0.0, 0.23);
+            double normalizedY = NormalizeCoordinate(position.y, 0.0, 0.23);
+            
+            outputFile << i + 1 << "," << normalizedX << "," << normalizedY << "\n";
+        }
+    }
+
+    outputFile.close();
+}
+
+// Function to read dataset and run the simulation
+void readDatasetAndRunSimulation() {
+    // Open the dataset CSV file
+    std::ifstream file("/mnt/c/Users/prith/OneDrive/Desktop/5G_MEC_Blockchain/NS3/augmented_dataset.csv");
+    if (!file.is_open()) {
+        NS_LOG_ERROR("Failed to open dataset file.");
+        return;
+    }
+
+    std::string line;
+    int userIndex = 0;
+
+    // Skip the header
+    std::getline(file, line);
+
+    // Read each line from the file and process it
+    std::vector<Ptr<Node>> nodeVec;
+    while (std::getline(file, line)) {
+        // Create nodes dynamically based on the number of users
+        if (userIndex >= nodeVec.size()) {
+            Ptr<Node> newNode = CreateObject<Node>();
+            nodeVec.push_back(newNode);
+        }
+
+        std::stringstream ss(line);
+        std::string userId, appType, signalStrength, latency, reqBandwidth, allocBandwidth, resourceAlloc;
+
+        // Read each value from the line
+        std::getline(ss, userId, ',');
+        std::getline(ss, appType, ',');
+        std::getline(ss, signalStrength, ',');
+        std::getline(ss, latency, ',');
+        std::getline(ss, reqBandwidth, ',');
+        std::getline(ss, allocBandwidth, ',');
+        std::getline(ss, resourceAlloc, ',');
+
+        // Log parsed data to ensure correct values
+        NS_LOG_INFO("User " << userIndex << " - signalStrength: " << signalStrength
+                            << ", allocBandwidth: " << allocBandwidth);
+
+        // Convert signal strength to double and calculate distance
+        double signalStrengthValue = std::stod(signalStrength);
+        double distance = CalculateDistanceFromSignalStrength(signalStrengthValue);
+
+        // Check if the node exists before proceeding
+        Ptr<Node> node = nodeVec[userIndex];
+        if (node == nullptr) {
+            NS_LOG_ERROR("Node " << userIndex << " is null. Skipping.");
+            continue;
+        }
+
+        // Create mobility model for this user
+        MobilityHelper userMobility;
+        userMobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+        userMobility.Install(node); // Install mobility on the current node
+
+        // Set position based on calculated distance (assuming distance is the radial distance from origin)
+        double x = distance;  // Example logic for X position
+        double y = distance / 2.0;  // Example logic for Y position (can be adjusted)
+        double z = 0.0;  // Static Z position
+
+        Ptr<ConstantPositionMobilityModel> mobilityModel = node->GetObject<ConstantPositionMobilityModel>();
+        if (mobilityModel) {
+            mobilityModel->SetPosition(Vector(x, y, z));  // Set the position
+        }
+
+        userIndex++;
+    }
+
+    file.close();
+
+    // Export coordinates to CSV
+    exportCoordinatesToCSV(nodeVec);
+
+    NS_LOG_INFO("Simulation complete.");
+}
+
+int main(int argc, char *argv[]) {
+    // Set up logging
+    LogComponentEnable("MecSimulation", LOG_LEVEL_INFO);
+
+    // Run the dataset processing and simulation
+    readDatasetAndRunSimulation();
+
+    return 0;
+}
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+NEW NS3 BASED CODE :
+
+#include "ns3/core-module.h"
+#include "ns3/mobility-module.h"
+#include "ns3/propagation-module.h"
+#include "ns3/log.h"
+#include "ns3/vector.h"
+#include "ns3/constant-position-mobility-model.h"
+#include "ns3/internet-module.h"
+#include "ns3/point-to-point-module.h"
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <cmath>
+
+using namespace ns3;
+
+NS_LOG_COMPONENT_DEFINE("RealMecSimulation");
+
+// Function to calculate distance from signal strength using Friis Propagation Loss Model
+double CalculateDistanceFromSignalStrength(double signalStrength, double frequency)
+{
+    // Path loss in dB (Signal Strength = -75 dBm example)
+    double pathLoss = -signalStrength; // Convert to positive for calculation
+
+    // Constants for the Friis Propagation Loss Model
+    const double K = 32.45; // Constant for 1 GHz and 1 meter distance
+
+    // Calculate the distance using the equation for Friis propagation
+    double distance = std::pow(10, (pathLoss - 20 * log10(frequency) - K) / 20);
+
+    return distance; // Return distance in meters
+}
+
+// Function to calculate distance from latency
+double CalculateDistanceFromLatency(double latency)
+{
+    // Speed of light in the network (approximately 3 * 10^8 meters/second)
+    const double speedOfLight = 3.0e8; // meters per second
+
+    // Assuming the latency is in milliseconds, convert it to seconds
+    double latencyInSeconds = latency / 1000.0;
+
+    // Calculate distance using the simple formula: distance = latency * speed
+    double distance = latencyInSeconds * speedOfLight;
+
+    return distance; // Return distance in meters
+}
+
+// Function to process the dataset and calculate distances
+void ProcessDataset(const std::string &inputFile, const std::string &outputFile)
+{
+    std::ifstream inFile(inputFile);
+    std::ofstream outFile(outputFile);
+    std::string line;
+
+    if (!inFile.is_open())
+    {
+        std::cerr << "Error opening input file." << std::endl;
+        return;
+    }
+
+    if (!outFile.is_open())
+    {
+        std::cerr << "Error opening output file." << std::endl;
+        return;
+    }
+
+    // Writing the header for the output file (User_ID, Distance)
+    outFile << "User_ID,Distance" << std::endl;
+
+    // Skip the header line in the input file
+    std::getline(inFile, line);
+
+    // Read each line of the dataset
+    while (std::getline(inFile, line))
+    {
+        std::istringstream iss(line);
+        std::string userIdStr, appTypeStr, signalStrengthStr, latencyStr;
+
+        // Read each field from the input file
+        std::getline(iss, userIdStr, ',');
+        std::getline(iss, appTypeStr, ',');
+        std::getline(iss, signalStrengthStr, ',');
+        std::getline(iss, latencyStr, ',');
+
+        // Convert signal strength and latency to appropriate types
+        double signalStrength = std::stod(signalStrengthStr); // Signal strength in dBm
+        double latency = std::stod(latencyStr);               // Latency in ms
+
+        // Use a frequency (for example, 2.4 GHz for WiFi)
+        double frequency = 2.4e9; // 2.4 GHz (WiFi frequency)
+
+        // Calculate the distance based on signal strength using Friis Model
+        double distanceFromSignal = CalculateDistanceFromSignalStrength(signalStrength, frequency);
+
+        // Calculate the distance based on latency
+        double distanceFromLatency = CalculateDistanceFromLatency(latency);
+
+        // Combine both distances: weighted average or simple average
+        double combinedDistance = (distanceFromSignal + distanceFromLatency) / 2.0;
+
+        // Write user information and combined distance to the output file
+        outFile << userIdStr << "," << combinedDistance << std::endl;
+    }
+
+    inFile.close();
+    outFile.close();
+}
+
+int main(int argc, char *argv[])
+{
+    // Enable logging for the simulation
+    LogComponentEnable("RealMecSimulation", LOG_LEVEL_INFO);
+
+    // Define input and output file paths
+    std::string inputFile = "/mnt/c/Users/prith/OneDrive/Desktop/5G_MEC_Blockchain/NS3/augmented_dataset.csv"; // Input CSV with the dataset
+    std::string outputFile = "/mnt/c/Users/prith/OneDrive/Desktop/5G_MEC_Blockchain/NS3/distance.csv";         // Output CSV for user_id and calculated distances
+
+    // Process the dataset and calculate distances
+    ProcessDataset(inputFile, outputFile);
+
+    std::cout << "Dataset processing complete. Distances have been written to " << outputFile << std::endl;
+
+    return 0;
+}
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+EXPLANATION FOR NS3 BASED CODE:
+
+Distance Calculation Summary
+The distance for each user is calculated based on Signal Strength and Latency using NS-3's inbuilt propagation models.
+
+Signal Strength:
+
+The Friis Propagation Loss Model from NS-3 is used to estimate the distance based on the signal strength.
+
+Latency :
+
+Latency is used to calculate distance by assuming signal propagation at the speed of light.
+
+​
+ =Latency (seconds)×Speed of Light
+Parameters: Latency (ms), Speed of Light (m/s).
+Combined Distance:
+
+The final distance for each user is the average of the Signal Strength-based distance and Latency-based distance.
+Flow:
+First, the Signal Strength is used with NS-3's Friis Propagation Loss Model to calculate a distance.
+Next, the Latency (time delay) is converted into distance by multiplying it by the speed of light.
+Finally, both distances are averaged to get the combined distance.
+This process ensures that both signal quality (via strength) and network performance (via latency) are considered to calculate the most accurate distance estimate for each user.
+
