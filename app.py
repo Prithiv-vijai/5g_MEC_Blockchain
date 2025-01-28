@@ -3,7 +3,7 @@ import lightgbm as lgb
 import pandas as pd
 
 # Load the saved model
-model = lgb.Booster(model_file='../model.txt')
+model = lgb.Booster(model_file='model.txt')
 
 app = Flask(__name__)
 

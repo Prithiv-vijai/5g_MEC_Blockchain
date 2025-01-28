@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y libgomp1
 WORKDIR /app
 
 # Copy the application code and model to the container
-COPY src/app.py ./
+COPY app.py ./
 COPY model.txt ./
 COPY requirements.txt ./
 

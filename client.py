@@ -122,7 +122,7 @@ def log_to_blockchain(user_id, allocated_bandwidth):
 
 
 # Load your dataset 
-df = pd.read_csv('../user_input.csv')
+df = pd.read_csv('user_input.csv')
 
 
 
@@ -178,8 +178,8 @@ ax.set_facecolor('#f0f0f0')  # Light grey background
 ax.grid(True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
 
 # Load images for visualization
-container_img = mpimg.imread('../images/edge.png')
-user_img = mpimg.imread('../images/user.png')
+container_img = mpimg.imread('images/edge.png')
+user_img = mpimg.imread('images/user.png')
 
 # Resize images
 container_img = offsetbox.OffsetImage(container_img, zoom=0.06)  # Slightly bigger image for containers
@@ -187,7 +187,7 @@ user_img = offsetbox.OffsetImage(user_img, zoom=0.035)  # Adjust user image size
 
 # Initialize CSV storage for each container
 for port in container_positions.keys():
-    csv_file = f'../output/container_{port}_data.csv'
+    csv_file = f'output/container_{port}_data.csv'
     pd.DataFrame(columns=['User_ID', 'Allocated_Bandwidth', 'Resource_Allocation']).to_csv(csv_file, index=False)
 
 # Track already added user labels
@@ -240,7 +240,7 @@ def update(frame):
             'Allocated_Bandwidth': predicted_allocated_bandwidth,
             'Resource_Allocation': user['Resource_Allocation']
         }
-        csv_file = f'../output/container_{container_port}_data.csv'
+        csv_file = f'output/container_{container_port}_data.csv'
         # Append to the respective container CSV file
         pd.DataFrame([result_data]).to_csv(csv_file, mode='a', header=False, index=False)
 
