@@ -11,11 +11,10 @@ import json
 # Blockchain setup
 GANACHE_URL = "http://127.0.0.1:7545"  # Ganache RPC URL
 web3 = Web3(Web3.HTTPProvider(GANACHE_URL))
-web3.eth.default_account = web3.eth.accounts[0]  # Set the default account for transactions
 
-# Load deployed contract
-#with open("build/contracts/UserAllocation.json") as f:
-#    contract_data = json.load(f)
+accounts = web3.eth.accounts[:10]  # Assuming 10 accounts available in Ganache
+
+
 
 contract_address = "0x629739ff45aEcff36eAefe9db59F59329eE0b154"  # Replace with your deployed contract address
 abi = [
@@ -111,14 +110,15 @@ abi = [
 contract = web3.eth.contract(address=contract_address, abi=abi)
 
 # Add user to blockchain
-# Add user to blockchain
-def log_to_blockchain(user_id, allocated_bandwidth):
+def log_to_blockchain(user_id, allocated_bandwidth, container_id):
     try:
+        # Use the container-specific "from address"
+        web3.eth.default_account = accounts[container_id]  # Set the account dynamically based on container_id
         tx_hash = contract.functions.addAllocation(int(user_id), int(float(allocated_bandwidth))).transact()
         receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
-        print(f"Logged to blockchain: User {user_id}, Bandwidth {allocated_bandwidth}, TX: {receipt.transactionHash.hex()}")
+        print(f"Logged to blockchain (Container {container_id}): User {user_id}, Bandwidth {allocated_bandwidth}, TX: {receipt.transactionHash.hex()}")
     except Exception as e:
-        print(f"Error logging to blockchain: {e}")
+        print(f"Error logging to blockchain (Container {container_id}): {e}")
 
 
 # Load your dataset 
@@ -128,9 +128,18 @@ df = pd.read_csv('user_input.csv')
 
 # Define the latitude and longitude ranges for each container (forming a triangle)
 container_positions = {
-    5001: {'lat': 60, 'lon': -60},  # Top-left vertex
-    5002: {'lat': 60, 'lon': 60},   # Top-right vertex
-    5003: {'lat': -60, 'lon': 0},   # Bottom vertex (center)
+    5001: {'lat': 60, 'lon': -60},  # Row 1
+    5002: {'lat': 60, 'lon': -20},  
+    5003: {'lat': 60, 'lon': 20},  
+    5004: {'lat': 60, 'lon': 60},  
+
+    5005: {'lat': 30, 'lon': -40},  # Row 2 (shifted left)
+    5006: {'lat': 30, 'lon': 0},  
+    5007: {'lat': 30, 'lon': 40},  
+
+    5008: {'lat': 0, 'lon': -60},   # Row 3 (shifted right)
+    5009: {'lat': 0, 'lon': -20},  
+    5010: {'lat': 0, 'lon': 20},  
 }
 
 # Extract Latitude and Longitude for clustering
@@ -169,7 +178,7 @@ input_columns = ['Application_Type', 'Signal_Strength', 'Latency', 'Required_Ban
 fig, ax = plt.subplots(figsize=(12, 8))  # Larger figure for better clarity
 ax.set_xlim(-110, 110)
 ax.set_ylim(-110, 110)
-ax.set_title("Multi Access Edge Computing - Visualization (3 Edges)", fontsize=16, weight='bold')
+ax.set_title("Multi Access Edge Computing - Visualization (10 Edges)", fontsize=16, weight='bold')
 ax.set_xlabel("Longitude", fontsize=14)
 ax.set_ylabel("Latitude", fontsize=14)
 
@@ -220,8 +229,10 @@ def update(frame):
         # Extract the predicted Allocated_Bandwidth if available
         predicted_allocated_bandwidth = prediction.get('prediction', ['Error'])[0] if prediction else 'Error'
 
-        # Log the allocation to the blockchain
-        log_to_blockchain(user_id, predicted_allocated_bandwidth)
+      # Log the allocation to the blockchain using the container's unique address
+        container_id = list(container_positions.keys()).index(container_port)  # Get container index (0-9)
+        log_to_blockchain(user_id, predicted_allocated_bandwidth, container_id)
+
 
         # Plot user position
         place_image(ax, user_img, lon, lat)

@@ -1,0 +1,72 @@
+
+version: "3.8"
+services:
+  container1:
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0xE4f49a1b5A95248E4Bd70FD7c695C78F8F33C462
+    ports:
+      - "5001:5000"  # Exposing port 5001
+
+  container2:
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0x83233b891ad0027ac9f202c42583FA44Eea083D6
+    ports:
+      - "5002:5000"  # Exposing port 5002
+
+  container3:
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0x5a6625a828639A85d79c7a9180A2900445A5E888
+    ports:
+      - "5003:5000"  # Exposing port 5003
+
+  container4:
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0x8AA17D31130840B6C6ff6735EDe272fd3b87199f
+    ports:
+      - "5004:5000"  # Exposing port 5004
+
+  container5:
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0x9a70841C7dFA84Fd719b0B982D689d9538f669Ce
+    ports:
+      - "5005:5000"  # Exposing port 5005
+
+  container6:
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0xc39726DFd3F6EaeE7928BFC35636e6e029eb39a5
+    ports:
+      - "5006:5000"  # Exposing port 5006
+
+  container7:
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0x6B6622e32771b5BC2257bd80e992bE5304F90348
+    ports:
+      - "5007:5000"  # Exposing port 5007
+
+  container8:
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0x365Ff6CcF386222F7EeFC28923c8eaEE459A89f5
+    ports:
+      - "5008:5000"  # Exposing port 5008
+
+  container9:
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0x266365AB6b31060cc4863e353d314fb79e49f46f
+    ports:
+      - "5009:5000"  # Exposing port 5009
+
+  container10:
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0xa959A684245735dd4E517F41445e393074C834FF
+    ports:
+      - "5010:5000"  # Exposing port 5010
