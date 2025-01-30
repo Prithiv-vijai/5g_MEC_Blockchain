@@ -128,18 +128,18 @@ df = pd.read_csv('user_input.csv')
 
 # Define the latitude and longitude ranges for each container (forming a triangle)
 container_positions = {
-    5001: {'lat': 60, 'lon': -60},  # Row 1
-    5002: {'lat': 60, 'lon': -20},  
-    5003: {'lat': 60, 'lon': 20},  
-    5004: {'lat': 60, 'lon': 60},  
+    5001: {'lat': 50, 'lon': -45},  # Row 1
+    5002: {'lat': 60, 'lon': 5},  
+    5003: {'lat': 50, 'lon': 55}, 
+     
+    5004: {'lat': 10, 'lon': -55},  
+    5005: {'lat': 10, 'lon': -15},  
+    5006: {'lat': 10, 'lon': 25},  
+    5007: {'lat': 10, 'lon': 65},  
 
-    5005: {'lat': 30, 'lon': -40},  # Row 2 (shifted left)
-    5006: {'lat': 30, 'lon': 0},  
-    5007: {'lat': 30, 'lon': 40},  
-
-    5008: {'lat': 0, 'lon': -60},   # Row 3 (shifted right)
-    5009: {'lat': 0, 'lon': -20},  
-    5010: {'lat': 0, 'lon': 20},  
+    5008: {'lat': -30, 'lon': -45},  
+    5009: {'lat': -50, 'lon': 5},  
+    5010: {'lat': -30, 'lon': 55},  
 }
 
 # Extract Latitude and Longitude for clustering
