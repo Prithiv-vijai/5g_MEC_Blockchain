@@ -13,25 +13,26 @@ def process_and_generate_coordinates(file1, file2, output_file):
     np.random.seed(42)  # For reproducibility
     angles = np.random.uniform(0, 2 * np.pi, len(merged_df))
 
-    # Step 4: Calculate x and y coordinates
-    x = merged_df['Distance'] * np.cos(angles)
-    y = merged_df['Distance'] * np.sin(angles)
+ 
+    # Step 5: Calculate x and y coordinates based on the normalized distance and random angles
+    x = merged_df['Distance_meters'] * np.cos(angles)
+    y = merged_df['Distance_meters'] * np.sin(angles)
 
-    # Step 5: Normalize the x and y coordinates to a scale of -99 to 99
-    merged_df['x_coordinate'] = 198 * (x - x.min()) / (x.max() - x.min()) - 99
-    merged_df['y_coordinate'] = 198 * (y - y.min()) / (y.max() - y.min()) - 99
+    # Step 6: Assign the calculated x and y coordinates to the dataset
+    merged_df['x_coordinate'] = x
+    merged_df['y_coordinate'] = y
 
-    # Step 6: Select the required columns for the final dataset
+    # Step 7: Select the required columns for the final dataset
     columns_to_keep = [
         'User_ID', 'Application_Type', 'Signal_Strength', 'Latency',
-        'Required_Bandwidth', 'Allocated_Bandwidth', 'Resource_Allocation',
-        'x_coordinate', 'y_coordinate'
+        'Required_Bandwidth', 'Allocated_Bandwidth', 'Resource_Allocation', 'Distance_meters',
+         'x_coordinate', 'y_coordinate'
     ]
     final_df = merged_df[columns_to_keep]
 
-    # Step 7: Save the updated dataset to a new CSV file
+    # Step 8: Save the updated dataset to a new CSV file
     final_df.to_csv(output_file, index=False)
-    print(f"Final dataset with x and y coordinates has been saved to {output_file}.")
+    print(f"Final dataset with x, y coordinates and normalized distance has been saved to {output_file}.")
 
 # Example usage
 file1 = r'augmented_dataset.csv'  # Path of your first dataset

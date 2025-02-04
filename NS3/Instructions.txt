@@ -5,12 +5,14 @@ COMMANDS
 
 1) first do:
 
+wsl -d ubuntu
 cd ~
 cd ns-allinone-3.43/ns-3.43
 
 2) to run : 
 
-./ns3 run real_mec
+./ns3 run distance_simulation
+./ns3 run mec_simulation
 
 3) to open explorer
 
@@ -18,7 +20,8 @@ explorer.exe .
 
 4) To open file
 
-nano scratch/real_mec.cc
+nano scratch/distance_simulation.cc
+nano scratch/mec_simulation.cc
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
