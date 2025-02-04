@@ -6,7 +6,15 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.image as mpimg
 import matplotlib.offsetbox as offsetbox
+import os 
 
+output_folder = 'output'
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
+    print(f"Folder '{output_folder}' created.")
+else:
+    print(f"Folder '{output_folder}' already exists.")
+    
 # Blockchain setup
 GANACHE_URL = "http://127.0.0.1:7545"
 web3 = Web3(Web3.HTTPProvider(GANACHE_URL))
@@ -162,7 +170,7 @@ def place_image(ax, image, x, y):
 for node, position in container_positions.items():
     place_image(ax, container_img, position['y_coordinate'], position['x_coordinate'])
 
-# Function to update user positions
+# Function to update user positions and log data to blockchain
 def update(frame):
     user = df.iloc[frame]
     lat, lon = user['x_coordinate'], user['y_coordinate']
@@ -183,6 +191,17 @@ def update(frame):
             [lat, container_positions[container_port]['x_coordinate']],
             'g:', linewidth=0.8, alpha=0.4
         )
+
+        # Save data to CSV with headers
+        result_data = {
+            'User_ID': int(user['User_ID']),
+            'Allocated_Bandwidth': allocated_bandwidth,
+            'Resource_Allocation': user['Resource_Allocation']
+        }
+        csv_file = f'output/container_{container_port}_data.csv'
+        # Check if the file exists and add headers if it does not
+        file_exists = pd.io.common.file_exists(csv_file)
+        pd.DataFrame([result_data]).to_csv(csv_file, mode='a', header=not file_exists, index=False)
 
 # Create animation
 ani = animation.FuncAnimation(fig, update, frames=len(df), repeat=False)

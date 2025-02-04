@@ -38,6 +38,11 @@ df[['Assigned_Edge_Node', 'New_Distance']] = df.apply(
     lambda row: find_nearest_edge(row['x_coordinate'], row['y_coordinate']), axis=1, result_type='expand'
 )
 
+x = df['x_coordinate']
+y = df['y_coordinate']
+df['x_coordinate'] = 198 * (x - x.min()) / (x.max() - x.min()) - 99
+df['y_coordinate'] = 198 * (y - y.min()) / (y.max() - y.min()) - 99
+
 # Define a scaling factor to reduce the sensitivity of the adjustment (less than 1)
 scaling_factor = 0.75  # Adjust this value to control the "looseness"
 

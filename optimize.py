@@ -3,14 +3,10 @@ import pandas as pd
 # Load the dataset
 input_file = "NS3/final_dataset.csv"
 output_file = "user_input.csv"
-output_size = 5000  # Desired size of the output dataset
+output_size = 1000  # Desired size of the output dataset
 
 # Load the original dataset
 data = pd.read_csv(input_file)
-
-# Update the Resource_Allocation column
-data['Resource_Allocation'] = data['Resource_Allocation'] * 1.2
-data['Resource_Allocation'] = data['Resource_Allocation'].clip(upper=100)
 
 # Ensure equal sampling for each Application_Type
 num_application_types = data['Application_Type'].nunique()
