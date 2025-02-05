@@ -54,6 +54,7 @@ df['Updated_Signal_Strength'] = df.apply(
 df['Updated_Latency'] = df.apply(
     lambda row: row['Latency'] * (row['New_Distance'] / row['Distance_meters']) ** scaling_factor 
     if row['Distance_meters'] != 0 else row['Latency'], axis=1)
+df = df.sort_values(by='User_ID')
 
 # Save the updated dataset with new distances, signal strength, and latency
 df.to_csv('clustered_user_data.csv', index=False)
