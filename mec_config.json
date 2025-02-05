@@ -1,0 +1,95 @@
+{
+    "ganache_url": "http://127.0.0.1:7545",
+    "contract_address": "0x629739ff45aEcff36eAefe9db59F59329eE0b154",
+    "abi": [
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "userId",
+            "type": "uint256"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "bandwidth",
+            "type": "uint256"
+          }
+        ],
+        "name": "AllocationAdded",
+        "type": "event"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "name": "allocations",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "userId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "bandwidth",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "userId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "bandwidth",
+            "type": "uint256"
+          }
+        ],
+        "name": "addAllocation",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getAllocations",
+        "outputs": [
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "userId",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "bandwidth",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct UserAllocation.Allocation[]",
+            "name": "",
+            "type": "tuple[]"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+      }
+    ]
+  }
+  

@@ -8,111 +8,26 @@ import matplotlib.animation as animation
 import matplotlib.image as mpimg
 import matplotlib.offsetbox as offsetbox
 import os
+from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor
 
 # Ensure 'output' folder exists
 output_folder = 'output'
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 
+
+# Load configuration from config.json
+with open('mec_config.json', 'r') as config_file:
+    config = json.load(config_file)
+    
+    
 # Blockchain setup
-GANACHE_URL = "http://127.0.0.1:7545"
+GANACHE_URL = config['ganache_url']
 web3 = Web3(Web3.HTTPProvider(GANACHE_URL))
 accounts = web3.eth.accounts[:10]
-
-
-contract_address = "0x629739ff45aEcff36eAefe9db59F59329eE0b154"  # Replace with your deployed contract address
-abi = [
-    {
-      "anonymous": False,
-      "inputs": [
-        {
-          "indexed": False,
-          "internalType": "uint256",
-          "name": "userId",
-          "type": "uint256"
-        },
-        {
-          "indexed": False,
-          "internalType": "uint256",
-          "name": "bandwidth",
-          "type": "uint256"
-        }
-      ],
-      "name": "AllocationAdded",
-      "type": "event"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "allocations",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "userId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "bandwidth",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": True
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "userId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "bandwidth",
-          "type": "uint256"
-        }
-      ],
-      "name": "addAllocation",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getAllocations",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "userId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "bandwidth",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct UserAllocation.Allocation[]",
-          "name": "",
-          "type": "tuple[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": True
-    }
-  ]
-
-
+contract_address = config['contract_address']
+abi = config['abi']
 contract = web3.eth.contract(address=contract_address, abi=abi)
 
 # Function to log allocation to blockchain
@@ -128,38 +43,38 @@ def log_to_blockchain(user_id, allocated_bandwidth, container_id):
 # Load processed dataset
 df = pd.read_csv('clustered_user_data.csv')
 
-# Define colors for network slices
-slice_colors = {
-    'eMBB': 'red',   # High bandwidth applications
-    'URLLC': 'blue',  # Low latency applications
-    'mMTC': 'green'   # IoT & massive connectivity
-}
+# Pre-caching colors for slices
+def get_slice_color(slice_type):
+    slice_colors = {'eMBB': 'red', 'URLLC': 'blue', 'mMTC': 'green'}
+    return slice_colors.get(slice_type.strip(), 'black')
 
 # Visualization setup
 fig, ax = plt.subplots(figsize=(14, 9))
 ax.set_xlim(-105, 105)
 ax.set_ylim(-105, 105)
-ax.set_title("Multi Access Edge Computing - Visualization ", fontsize=16, weight='bold')
+ax.set_title("Multi Access Edge Computing - Visualization", fontsize=16, weight='bold')
 ax.set_xlabel("Longitude", fontsize=14)
 ax.set_ylabel("Latitude", fontsize=14)
 ax.set_facecolor('#f0f0f0')
 ax.grid(True, linestyle='--', linewidth=0.5, alpha=0.8)
 
-# Dictionary to map edge node positions
+# Precompute container positions
 container_positions = df.groupby('Assigned_Edge_Node')[['x_coordinate', 'y_coordinate']].mean().to_dict(orient='index')
 
-# Function to plot images at specific coordinates
-def place_image(ax, image, x, y):
-    imagebox = offsetbox.AnnotationBbox(image, (x, y), frameon=False)
-    ax.add_artist(imagebox)
+# Pre-load images (Performance Optimization)
+image_cache = {
+    "container": offsetbox.OffsetImage(mpimg.imread('files/c.png'), zoom=0.04),
+    "user": offsetbox.OffsetImage(mpimg.imread('files/user.png'), zoom=0.03)
+}
 
-# Load container and user images
-container_img = offsetbox.OffsetImage(mpimg.imread('files/c.png'), zoom=0.04)
-user_img = offsetbox.OffsetImage(mpimg.imread('files/user.png'), zoom=0.03)
+# Function to place images at coordinates
+def place_image(ax, image_key, x, y):
+    imagebox = offsetbox.AnnotationBbox(image_cache[image_key], (x, y), frameon=False)
+    ax.add_artist(imagebox)
 
 # Plot edge node positions (containers)
 for node, position in container_positions.items():
-    place_image(ax, container_img, position['y_coordinate'], position['x_coordinate'])
+    place_image(ax, "container", position['y_coordinate'], position['x_coordinate'])
 
 # Function to send data to the appropriate container
 def send_data_to_container(user_data, container_port):
@@ -178,6 +93,9 @@ input_columns = ['Application_Type', 'Signal_Strength', 'Latency', 'Required_Ban
 # Store animated lines for updates
 animated_lines = []
 
+# ThreadPoolExecutor for parallel execution
+executor = ThreadPoolExecutor(max_workers=5)
+
 # Function to update user positions and create data flow effect
 def update(frame):
     user = df.iloc[frame]
@@ -185,29 +103,31 @@ def update(frame):
     user_id = user['User_ID']
     container_port = int(user['Assigned_Edge_Node'])
 
-    # Fetch the correct network slice type
     slice_type = str(user['Network_Slice']).strip()
+    color = get_slice_color(slice_type)
 
     if container_port in container_positions:
         user_data = user[input_columns].to_dict()
-        prediction = send_data_to_container(user_data, container_port)
+
+        # Run data sending in parallel
+        future = executor.submit(send_data_to_container, user_data, container_port)
+
+        # Get prediction asynchronously
+        prediction = future.result()
         allocated_bandwidth = prediction.get('prediction', ['Error'])[0] if prediction else 'Error'
 
         container_id = list(container_positions.keys()).index(container_port)
         log_to_blockchain(user_id, allocated_bandwidth, container_id)
 
-       # Ensure slice_type has a valid color
-        color = slice_colors.get(slice_type, 'black')
-
         # Plot user image at correct coordinates
-        place_image(ax, user_img, lon, lat)
+        place_image(ax, "user", lon, lat)
 
         # Flowing line effect: Multiple short segments appearing sequentially
         x_start, y_start = lon, lat
         x_end, y_end = container_positions[container_port]['y_coordinate'], container_positions[container_port]['x_coordinate']
 
-        num_segments = 8  # Number of segments to create flowing effect
-        alpha_values = np.linspace(0.2, 0.8, num_segments)[::-1]  # Reverse the opacity gradient
+        num_segments = 8
+        alpha_values = np.linspace(0.2, 0.8, num_segments)[::-1]
 
         for i in range(num_segments):
             segment_x = np.linspace(x_start, x_end, num_segments)[i:i+2]
@@ -226,8 +146,8 @@ def update(frame):
         pd.DataFrame([result_data]).to_csv(csv_file, mode='a', header=not file_exists, index=False)
 
 # Create the legend correctly
-handles = [plt.Line2D([0], [0], linestyle="dashed", linewidth=1, color=color, label=slice_type)
-           for slice_type, color in slice_colors.items()]
+handles = [plt.Line2D([0], [0], linestyle="dashed", linewidth=1, color=get_slice_color(slice_type), label=slice_type)
+           for slice_type in ['eMBB', 'URLLC', 'mMTC']]
 ax.legend(handles=handles, loc='upper right')
 
 # Create animation with a "flowing" effect
