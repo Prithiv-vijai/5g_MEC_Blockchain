@@ -1,72 +1,81 @@
-
 version: "3.8"
 services:
-  container1:
+  edge_1:
+    container_name: edge_1
     image: lightgbm-container:latest
     environment:
       - FROM_ADDRESS=0xE4f49a1b5A95248E4Bd70FD7c695C78F8F33C462
     ports:
-      - "5001:5000"  # Exposing port 5001
+      - "5001:5000"
 
-  container2:
+  edge_2:
+    container_name: edge_2
     image: lightgbm-container:latest
     environment:
       - FROM_ADDRESS=0x83233b891ad0027ac9f202c42583FA44Eea083D6
     ports:
-      - "5002:5000"  # Exposing port 5002
+      - "5002:5000"
 
-  container3:
+  edge_3:
+    container_name: edge_3
     image: lightgbm-container:latest
     environment:
       - FROM_ADDRESS=0x5a6625a828639A85d79c7a9180A2900445A5E888
     ports:
-      - "5003:5000"  # Exposing port 5003
+      - "5003:5000"
 
-  container4:
+  edge_4:
+    container_name: edge_4
     image: lightgbm-container:latest
     environment:
       - FROM_ADDRESS=0x8AA17D31130840B6C6ff6735EDe272fd3b87199f
     ports:
-      - "5004:5000"  # Exposing port 5004
+      - "5004:5000"
 
-  container5:
+  edge_5:
+    container_name: edge_5
     image: lightgbm-container:latest
     environment:
       - FROM_ADDRESS=0x9a70841C7dFA84Fd719b0B982D689d9538f669Ce
     ports:
-      - "5005:5000"  # Exposing port 5005
+      - "5005:5000"
 
-  container6:
+  edge_6:
+    container_name: edge_6
     image: lightgbm-container:latest
     environment:
       - FROM_ADDRESS=0xc39726DFd3F6EaeE7928BFC35636e6e029eb39a5
     ports:
-      - "5006:5000"  # Exposing port 5006
+      - "5006:5000"
 
-  container7:
+  edge_7:
+    container_name: edge_7
     image: lightgbm-container:latest
     environment:
       - FROM_ADDRESS=0x6B6622e32771b5BC2257bd80e992bE5304F90348
     ports:
-      - "5007:5000"  # Exposing port 5007
+      - "5007:5000"
 
-  container8:
+  edge_8:
+    container_name: edge_8
     image: lightgbm-container:latest
     environment:
       - FROM_ADDRESS=0x365Ff6CcF386222F7EeFC28923c8eaEE459A89f5
     ports:
-      - "5008:5000"  # Exposing port 5008
+      - "5008:5000"
 
-  container9:
+  edge_9:
+    container_name: edge_9
     image: lightgbm-container:latest
     environment:
       - FROM_ADDRESS=0x266365AB6b31060cc4863e353d314fb79e49f46f
     ports:
-      - "5009:5000"  # Exposing port 5009
+      - "5009:5000"
 
-  container10:
+  edge_10:
+    container_name: edge_10
     image: lightgbm-container:latest
     environment:
       - FROM_ADDRESS=0xa959A684245735dd4E517F41445e393074C834FF
     ports:
-      - "5010:5000"  # Exposing port 5010
+      - "5010:5000"

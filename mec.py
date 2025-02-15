@@ -8,19 +8,19 @@ import matplotlib.animation as animation
 import matplotlib.image as mpimg
 import matplotlib.offsetbox as offsetbox
 import os
+import shutil
 from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor
 
-# Ensure 'output' folder exists
 output_folder = 'output'
-if not os.path.exists(output_folder):
-    os.makedirs(output_folder)
-
+if os.path.exists(output_folder):
+    shutil.rmtree(output_folder)  # Delete the existing folder
+os.makedirs(output_folder)  # Create a new folder
+output_file = os.path.join(output_folder, 'output_container_data.csv')
 
 # Load configuration from config.json
 with open('mec_config.json', 'r') as config_file:
     config = json.load(config_file)
-    
     
 # Blockchain setup
 GANACHE_URL = config['ganache_url']
@@ -30,7 +30,6 @@ contract_address = config['contract_address']
 abi = config['abi']
 contract = web3.eth.contract(address=contract_address, abi=abi)
 
-# Function to log allocation to blockchain
 def log_to_blockchain(user_id, allocated_bandwidth, container_id):
     try:
         web3.eth.default_account = accounts[container_id]
@@ -43,12 +42,10 @@ def log_to_blockchain(user_id, allocated_bandwidth, container_id):
 # Load processed dataset
 df = pd.read_csv('clustered_user_data.csv')
 
-# Pre-caching colors for slices
 def get_slice_color(slice_type):
     slice_colors = {'eMBB': 'red', 'URLLC': 'blue', 'mMTC': 'green'}
     return slice_colors.get(slice_type.strip(), 'black')
 
-# Visualization setup
 fig, ax = plt.subplots(figsize=(14, 9))
 ax.set_xlim(-105, 105)
 ax.set_ylim(-105, 105)
@@ -58,25 +55,20 @@ ax.set_ylabel("Latitude", fontsize=14)
 ax.set_facecolor('#f0f0f0')
 ax.grid(True, linestyle='--', linewidth=0.5, alpha=0.8)
 
-# Precompute container positions
 container_positions = df.groupby('Assigned_Edge_Node')[['x_coordinate', 'y_coordinate']].mean().to_dict(orient='index')
 
-# Pre-load images (Performance Optimization)
 image_cache = {
     "container": offsetbox.OffsetImage(mpimg.imread('files/c.png'), zoom=0.04),
     "user": offsetbox.OffsetImage(mpimg.imread('files/user.png'), zoom=0.03)
 }
 
-# Function to place images at coordinates
 def place_image(ax, image_key, x, y):
     imagebox = offsetbox.AnnotationBbox(image_cache[image_key], (x, y), frameon=False)
     ax.add_artist(imagebox)
 
-# Plot edge node positions (containers)
 for node, position in container_positions.items():
     place_image(ax, "container", position['y_coordinate'], position['x_coordinate'])
 
-# Function to send data to the appropriate container
 def send_data_to_container(user_data, container_port):
     url = f'http://localhost:{container_port}/predict'
     try:
@@ -87,16 +79,11 @@ def send_data_to_container(user_data, container_port):
         print(f"Error while sending data to container {container_port}: {e}")
         return None
 
-# Define input columns
-input_columns = ['Application_Type', 'Signal_Strength', 'Latency', 'Required_Bandwidth', 'Resource_Allocation']
+input_columns = ['Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth' ,'Allocated_Bandwidth']
 
-# Store animated lines for updates
 animated_lines = []
-
-# ThreadPoolExecutor for parallel execution
 executor = ThreadPoolExecutor(max_workers=5)
 
-# Function to update user positions and create data flow effect
 def update(frame):
     user = df.iloc[frame]
     lat, lon = user['x_coordinate'], user['y_coordinate']
@@ -108,49 +95,42 @@ def update(frame):
 
     if container_port in container_positions:
         user_data = user[input_columns].to_dict()
-
-        # Run data sending in parallel
         future = executor.submit(send_data_to_container, user_data, container_port)
-
-        # Get prediction asynchronously
         prediction = future.result()
-        allocated_bandwidth = prediction.get('prediction', ['Error'])[0] if prediction else 'Error'
+        new_resource_allocation = prediction.get('prediction', ['Error'])[0] if prediction else 'Error'
 
         container_id = list(container_positions.keys()).index(container_port)
-        log_to_blockchain(user_id, allocated_bandwidth, container_id)
+        log_to_blockchain(user_id, new_resource_allocation, container_id)
 
-        # Plot user image at correct coordinates
         place_image(ax, "user", lon, lat)
-
-        # Flowing line effect: Multiple short segments appearing sequentially
+        
         x_start, y_start = lon, lat
         x_end, y_end = container_positions[container_port]['y_coordinate'], container_positions[container_port]['x_coordinate']
-
+        
         num_segments = 8
         alpha_values = np.linspace(0.2, 0.8, num_segments)[::-1]
-
         for i in range(num_segments):
             segment_x = np.linspace(x_start, x_end, num_segments)[i:i+2]
             segment_y = np.linspace(y_start, y_end, num_segments)[i:i+2]
             line, = ax.plot(segment_x, segment_y, linestyle="-", linewidth=1, color=color, alpha=alpha_values[i])
             animated_lines.append(line)
 
-        # Save data to CSV with headers
+        old_resource_allocation = user['Resource_Allocation']
+
         result_data = {
             'User_ID': int(user['User_ID']),
-            'Allocated_Bandwidth': allocated_bandwidth,
-            'Resource_Allocation': user['Resource_Allocation']
+            'Assigned_Edge_Node': container_port,
+            'Old_Resource_Allocation': old_resource_allocation,
+            'New_Resource_Allocation': new_resource_allocation,
+            'Allocated_Bandwidth': user['Allocated_Bandwidth']
         }
-        csv_file = f'output/container_{container_port}_data.csv'
-        file_exists = os.path.exists(csv_file)
-        pd.DataFrame([result_data]).to_csv(csv_file, mode='a', header=not file_exists, index=False)
 
-# Create the legend correctly
+        file_exists = os.path.exists(output_file)
+        pd.DataFrame([result_data]).to_csv(output_file, mode='a', header=not file_exists, index=False)
+
 handles = [plt.Line2D([0], [0], linestyle="dashed", linewidth=1, color=get_slice_color(slice_type), label=slice_type)
            for slice_type in ['eMBB', 'URLLC', 'mMTC']]
 ax.legend(handles=handles, loc='upper right')
 
-# Create animation with a "flowing" effect
 ani = animation.FuncAnimation(fig, update, frames=len(df), repeat=False, interval=200, blit=False)
-
 plt.show()

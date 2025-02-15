@@ -8,8 +8,8 @@ import time
 data = pd.read_csv('NS3/augmented_dataset.csv')
 
 # Define features and target
-X = data[['Application_Type', 'Signal_Strength', 'Latency', 'Required_Bandwidth' ,'Resource_Allocation']]
-y = data['Allocated_Bandwidth']
+X = data[['Signal_Strength', 'Latency', 'Required_Bandwidth' ,'Allocated_Bandwidth']]
+y = data['Resource_Allocation']
 
 # Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)

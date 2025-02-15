@@ -47,7 +47,7 @@ df['y_coordinate'] = 198 * (y - y.min()) / (y.max() - y.min()) - 99
 
 # Define scaling factors for signal strength and latency adjustments based on distance
 scaling_factor = 0.75  # Adjust this value to control the "looseness"
-reference_factor = 0.1
+reference_factor = 0.26
 
 # Apply the transformation to update Signal Strength and Latency based on the new distance
 df['Updated_Signal_Strength'] = df.apply(
