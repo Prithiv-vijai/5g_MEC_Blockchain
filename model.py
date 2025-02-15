@@ -7,14 +7,18 @@ import time
 # Load the dataset
 data = pd.read_csv('NS3/augmented_dataset.csv')
 
-# Define features and target
-X = data[['Signal_Strength', 'Latency', 'Required_Bandwidth' ,'Allocated_Bandwidth']]
-y = data['Resource_Allocation']
+# Define feature sets and targets
+X1 = data[['Signal_Strength', 'Latency', 'Required_Bandwidth', 'Allocated_Bandwidth']]
+y1 = data['Resource_Allocation']
 
-# Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+X2 = data[['Application_Type','Signal_Strength', 'Latency', 'Required_Bandwidth', 'Resource_Allocation']]  
+y2 = data['Allocated_Bandwidth']  
 
-# Define LightGBM parameters based on the provided values
+# Split data
+X1_train, X1_test, y1_train, y1_test = train_test_split(X1, y1, test_size=0.3, random_state=42)
+X2_train, X2_test, y2_train, y2_test = train_test_split(X2, y2, test_size=0.3, random_state=42)
+
+# LightGBM Parameters
 params = {
     'num_leaves': 31,
     'n_estimators': 250,
@@ -27,49 +31,39 @@ params = {
     'metric': 'rmse'
 }
 
-# Initialize the LightGBM Regressor
-model = lgb.LGBMRegressor(
-    num_leaves=params['num_leaves'],
-    n_estimators=params['n_estimators'],
-    learning_rate=params['learning_rate'],
-    max_depth=params['max_depth'],
-    min_child_samples=params['min_data_in_leaf'],
-    reg_alpha=params['lambda_l1'],
-    reg_lambda=params['lambda_l2']
-)
-
-# Train the model
-print("Training LightGBM model...")
+# Train first model
+print("\nTraining Model 1...")
+model1 = lgb.LGBMRegressor(**params)
 start_time = time.time()
-model.fit(X_train, y_train)
-end_time = time.time()
-print(f"Model training completed in {end_time - start_time:.2f} seconds.")
+model1.fit(X1_train, y1_train)
+print(f"Model 1 trained in {time.time() - start_time:.2f} seconds.")
 
-# Save the model to model.txt
-print("Saving the model to model.txt...")
-booster = model.booster_  # Get the underlying LightGBM Booster
-booster.save_model('model.txt')
-print("Model saved successfully!")
+# Save Model 1
+print("Saving Model 1 as model1.txt...")
+model1.booster_.save_model('model1.txt')
 
-# Make predictions
-y_pred_train = model.predict(X_train)
-y_pred_test = model.predict(X_test)
+# Train second model
+print("\nTraining Model 2...")
+model2 = lgb.LGBMRegressor(**params)
+start_time = time.time()
+model2.fit(X2_train, y2_train)
+print(f"Model 2 trained in {time.time() - start_time:.2f} seconds.")
 
-# Evaluate the model
-print("Model Evaluation:")
+# Save Model 2
+print("Saving Model 2 as model2.txt...")
+model2.booster_.save_model('model2.txt')
 
-# Check sklearn version to decide on RMSE calculation
-try:
-    # Use the squared parameter for newer scikit-learn versions
-    print(f"Train RMSE: {mean_squared_error(y_train, y_pred_train, squared=False):.4f}")
-    print(f"Test RMSE: {mean_squared_error(y_test, y_pred_test, squared=False):.4f}")
-except TypeError:
-    # For older scikit-learn versions, compute RMSE manually
-    train_rmse = mean_squared_error(y_train, y_pred_train) ** 0.5
-    test_rmse = mean_squared_error(y_test, y_pred_test) ** 0.5
-    print(f"Train RMSE: {train_rmse:.4f}")
-    print(f"Test RMSE: {test_rmse:.4f}")
+# Predictions
+y1_pred_test = model1.predict(X1_test)
+y2_pred_test = model2.predict(X2_test)
 
-print(f"Train R2 Score: {r2_score(y_train, y_pred_train):.4f}")
-print(f"Test R2 Score: {r2_score(y_test, y_pred_test):.4f}")
-print(f"Test MAE: {mean_absolute_error(y_test, y_pred_test):.4f}")
+# Evaluation
+print("\nModel 1 Evaluation:")
+print(f"Test RMSE: {mean_squared_error(y1_test, y1_pred_test, squared=False):.4f}")
+print(f"Test R2 Score: {r2_score(y1_test, y1_pred_test):.4f}")
+print(f"Test MAE: {mean_absolute_error(y1_test, y1_pred_test):.4f}")
+
+print("\nModel 2 Evaluation:")
+print(f"Test RMSE: {mean_squared_error(y2_test, y2_pred_test, squared=False):.4f}")
+print(f"Test R2 Score: {r2_score(y2_test, y2_pred_test):.4f}")
+print(f"Test MAE: {mean_absolute_error(y2_test, y2_pred_test):.4f}")

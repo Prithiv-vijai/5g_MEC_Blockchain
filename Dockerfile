@@ -9,7 +9,8 @@ WORKDIR /app
 
 # Copy the application code and model to the container
 COPY app.py ./
-COPY model.txt ./
+COPY model1.txt ./
+COPY model2.txt ./
 COPY requirements.txt ./
 
 # Install required dependencies

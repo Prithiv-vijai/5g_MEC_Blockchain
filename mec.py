@@ -8,7 +8,6 @@ import matplotlib.animation as animation
 import matplotlib.image as mpimg
 import matplotlib.offsetbox as offsetbox
 import os
-import shutil
 from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor
 
@@ -22,7 +21,7 @@ if os.path.exists(output_file):
 # Load configuration from config.json
 with open('mec_config.json', 'r') as config_file:
     config = json.load(config_file)
-    
+
 # Blockchain setup
 GANACHE_URL = config['ganache_url']
 web3 = Web3(Web3.HTTPProvider(GANACHE_URL))
@@ -70,17 +69,18 @@ def place_image(ax, image_key, x, y):
 for node, position in container_positions.items():
     place_image(ax, "container", position['y_coordinate'], position['x_coordinate'])
 
-def send_data_to_container(user_data, container_port):
-    url = f'http://localhost:{container_port}/predict'
+def send_data_to_container(user_data, container_port, endpoint):
+    url = f'http://localhost:{container_port}/{endpoint}'
     try:
         response = requests.post(url, json=user_data)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
-        print(f"Error while sending data to container {container_port}: {e}")
+        print(f"Error while sending data to {endpoint} on container {container_port}: {e}")
         return None
 
-input_columns = ['Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth' ,'Allocated_Bandwidth']
+input_columns_1 = ['Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth' ,'Allocated_Bandwidth']
+input_columns_2 = ['Application_Type','Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth', 'Resource_Allocation']
 
 animated_lines = []
 executor = ThreadPoolExecutor(max_workers=5)
@@ -95,13 +95,24 @@ def update(frame):
     color = get_slice_color(slice_type)
 
     if container_port in container_positions:
-        user_data = user[input_columns].to_dict()
-        future = executor.submit(send_data_to_container, user_data, container_port)
-        prediction = future.result()
-        new_resource_allocation = prediction.get('prediction', ['Error'])[0] if prediction else 'Error'
+        # **First Prediction (Predict1)**
+        user_data_1 = user[input_columns_1].to_dict()
+        future1 = executor.submit(send_data_to_container, user_data_1, container_port, 'predict1')
+        prediction1 = future1.result()
+        new_resource_allocation = prediction1.get('prediction', ['Error'])[0] if prediction1 else 'Error'
+
+        # **Second Prediction (Predict2)**
+        adjusted_signal_strength = user['Signal_Strength'] - abs(user['Updated_Signal_Strength'] - user['Signal_Strength'])
+        user_data_2 = user[input_columns_2].to_dict()
+        user_data_2['Resource_Allocation'] = new_resource_allocation
+        user_data_2['Updated_Signal_Strength'] = adjusted_signal_strength
+        user_data_2['Required_Bandwidth'] *= 0.8
+        future2 = executor.submit(send_data_to_container, user_data_2, container_port, 'predict2')
+        prediction2 = future2.result()
+        new_allocated_bandwidth = prediction2.get('prediction', ['Error'])[0] if prediction2 else 'Error'
 
         container_id = list(container_positions.keys()).index(container_port)
-        log_to_blockchain(user_id, new_resource_allocation, container_id)
+        log_to_blockchain(user_id, new_allocated_bandwidth, container_id)
 
         place_image(ax, "user", lon, lat)
         
@@ -123,7 +134,8 @@ def update(frame):
             'Assigned_Edge_Node': container_port,
             'Old_Resource_Allocation': old_resource_allocation,
             'New_Resource_Allocation': new_resource_allocation,
-            'Allocated_Bandwidth': user['Allocated_Bandwidth']
+            'Allocated_Bandwidth': user['Allocated_Bandwidth'],
+            'New_Allocated_Bandwidth': new_allocated_bandwidth  
         }
 
         file_exists = os.path.exists(output_file)

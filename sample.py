@@ -3,7 +3,7 @@ import pandas as pd
 # Load the dataset
 input_file = "NS3/final_dataset.csv"
 output_file = "user_input.csv"
-output_size = 5000  # Desired size of the output dataset
+output_size = 500  # Desired size of the output dataset
 
 # Load the original dataset
 data = pd.read_csv(input_file)
