@@ -13,10 +13,11 @@ from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor
 
 output_folder = 'output'
-if os.path.exists(output_folder):
-    shutil.rmtree(output_folder)  # Delete the existing folder
-os.makedirs(output_folder)  # Create a new folder
-output_file = os.path.join(output_folder, 'output_container_data.csv')
+output_file = os.path.join(output_folder, "output_container_data.csv")
+
+# Delete existing output file if it exists to start fresh
+if os.path.exists(output_file):
+    os.remove(output_file)
 
 # Load configuration from config.json
 with open('mec_config.json', 'r') as config_file:
