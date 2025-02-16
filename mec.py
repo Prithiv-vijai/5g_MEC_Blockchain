@@ -85,6 +85,36 @@ input_columns_2 = ['Application_Type','Updated_Signal_Strength', 'Updated_Latenc
 animated_lines = []
 executor = ThreadPoolExecutor(max_workers=5)
 
+def enforce_qos(slice_type, allocated_bandwidth, latency):
+    if slice_type == 'URLLC':
+        # Ensure ultra-low latency and high reliability
+        latency_threshold = 20  # Desired latency threshold for URLLC (ms)
+        if latency > latency_threshold:
+            # Proportional increase based on how much latency exceeds the threshold
+            latency_excess = latency - latency_threshold
+            increase_factor = 1 + (latency_excess / latency_threshold) * 0.2  
+            allocated_bandwidth *= increase_factor
+
+    elif slice_type == 'eMBB':
+        # Ensure high bandwidth and moderate latency
+        bandwidth_threshold = 1000  # Desired bandwidth threshold for eMBB (kbps)
+        if allocated_bandwidth < bandwidth_threshold:
+            # Proportional increase based on how much bandwidth is below the threshold
+            bandwidth_deficit = bandwidth_threshold - allocated_bandwidth
+            increase_factor = 1 + (bandwidth_deficit / bandwidth_threshold) * 0.3  
+            allocated_bandwidth *= increase_factor
+
+    elif slice_type == 'mMTC':
+        # Ensure moderate bandwidth and tolerate higher latency
+        bandwidth_threshold = 100  # Desired bandwidth threshold for mMTC (kbps)
+        if allocated_bandwidth < bandwidth_threshold:
+            # Proportional increase based on how much bandwidth is below the threshold
+            bandwidth_deficit = bandwidth_threshold - allocated_bandwidth
+            increase_factor = 1 + (bandwidth_deficit / bandwidth_threshold) * 0.1  
+            allocated_bandwidth *= increase_factor
+
+    return allocated_bandwidth
+
 def update(frame):
     user = df.iloc[frame]
     lat, lon = user['x_coordinate'], user['y_coordinate']
@@ -110,6 +140,7 @@ def update(frame):
         future2 = executor.submit(send_data_to_container, user_data_2, container_port, 'predict2')
         prediction2 = future2.result()
         new_allocated_bandwidth = prediction2.get('prediction', ['Error'])[0] if prediction2 else 'Error'
+        new_allocated_bandwidth = enforce_qos(slice_type, new_allocated_bandwidth,user_data_2['Updated_Latency'])
 
         container_id = list(container_positions.keys()).index(container_port)
         log_to_blockchain(user_id, new_allocated_bandwidth, container_id)
