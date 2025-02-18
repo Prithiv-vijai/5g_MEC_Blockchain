@@ -7,7 +7,7 @@ YELLOW='\033[0;33m'    # Yellow for process steps
 CYAN='\033[0;36m'      # Cyan for section headers
 NC='\033[0m'           # Reset color
 
-export OUTPUT_SIZE=500
+export OUTPUT_SIZE=15000
 
 # ================================
 # STEP 1: Sampling Process
