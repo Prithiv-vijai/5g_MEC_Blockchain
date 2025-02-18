@@ -1,9 +1,12 @@
 import pandas as pd
+import os
 
-# Load the dataset
+# Get the sample size from the environment variable
+output_size = int(os.getenv("OUTPUT_SIZE"))
+
+# Define the input and output file paths
 input_file = "NS3/final_dataset.csv"
 output_file = "user_input.csv"
-output_size = 500  # Desired size of the output dataset
 
 # Load the original dataset
 data = pd.read_csv(input_file)

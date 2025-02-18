@@ -1,19 +1,34 @@
+import os
 import requests
 import pandas as pd
 from web3 import Web3
 import json
-import numpy as np  
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.image as mpimg
 import matplotlib.offsetbox as offsetbox
-import os
-from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor
+import matplotlib
 
-output_folder = 'output'
-output_file = os.path.join(output_folder, "output_container_data.csv")
+matplotlib.use('Agg')  # Change the backend to avoid opening a window
+matplotlib.rcParams['font.family'] = 'Times New Roman'
 
+# Fetching environment variables
+input_file = os.environ.get('INPUT_FILE')
+output_folder = os.environ.get('OUTPUT_FOLDER')
+output_file_name = os.environ.get('OUTPUT_FILE')
+output_file = os.path.join(output_folder, output_file_name)
+output_file_name = output_file_name[:-4]
+
+
+# Define the directory path
+directory = 'graphs/mec'
+if not os.path.exists(directory):
+    os.makedirs(directory)
+    print(f"Directory '{directory}' created.")
+else:
+    print(f"Directory '{directory}' already exists.")
 # Delete existing output file if it exists to start fresh
 if os.path.exists(output_file):
     os.remove(output_file)
@@ -40,7 +55,7 @@ def log_to_blockchain(user_id, allocated_bandwidth, container_id):
         print(f"Error logging to blockchain (Container {container_id}): {e}")
 
 # Load processed dataset
-df = pd.read_csv('clustered_user_data.csv')
+df = pd.read_csv(input_file)
 
 def get_slice_color(slice_type):
     slice_colors = {'eMBB': 'red', 'URLLC': 'blue', 'mMTC': 'green'}
@@ -49,7 +64,7 @@ def get_slice_color(slice_type):
 fig, ax = plt.subplots(figsize=(14, 9))
 ax.set_xlim(-105, 105)
 ax.set_ylim(-105, 105)
-ax.set_title("Multi Access Edge Computing - Visualization", fontsize=16, weight='bold')
+ax.set_title(f"Multi Access Edge Computing - Visualization ({output_file_name})", fontsize=16, weight='bold')
 ax.set_xlabel("Longitude", fontsize=14)
 ax.set_ylabel("Latitude", fontsize=14)
 ax.set_facecolor('#f0f0f0')
@@ -79,7 +94,7 @@ def send_data_to_container(user_data, container_port, endpoint):
         print(f"Error while sending data to {endpoint} on container {container_port}: {e}")
         return None
 
-input_columns_1 = ['Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth' ,'Allocated_Bandwidth']
+input_columns_1 = ['Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth']
 input_columns_2 = ['Application_Type','Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth', 'Resource_Allocation']
 
 animated_lines = []
@@ -87,28 +102,20 @@ executor = ThreadPoolExecutor(max_workers=5)
 
 def enforce_qos(slice_type, allocated_bandwidth, latency):
     if slice_type == 'URLLC':
-        # Ensure ultra-low latency and high reliability
-        latency_threshold = 20  # Desired latency threshold for URLLC (ms)
+        latency_threshold = 20
         if latency > latency_threshold:
-            # Proportional increase based on how much latency exceeds the threshold
             latency_excess = latency - latency_threshold
             increase_factor = 1 + (latency_excess / latency_threshold) * 0.2  
             allocated_bandwidth *= increase_factor
-
     elif slice_type == 'eMBB':
-        # Ensure high bandwidth and moderate latency
-        bandwidth_threshold = 1000  # Desired bandwidth threshold for eMBB (kbps)
+        bandwidth_threshold = 1000
         if allocated_bandwidth < bandwidth_threshold:
-            # Proportional increase based on how much bandwidth is below the threshold
             bandwidth_deficit = bandwidth_threshold - allocated_bandwidth
             increase_factor = 1 + (bandwidth_deficit / bandwidth_threshold) * 0.3  
             allocated_bandwidth *= increase_factor
-
     elif slice_type == 'mMTC':
-        # Ensure moderate bandwidth and tolerate higher latency
-        bandwidth_threshold = 100  # Desired bandwidth threshold for mMTC (kbps)
+        bandwidth_threshold = 100
         if allocated_bandwidth < bandwidth_threshold:
-            # Proportional increase based on how much bandwidth is below the threshold
             bandwidth_deficit = bandwidth_threshold - allocated_bandwidth
             increase_factor = 1 + (bandwidth_deficit / bandwidth_threshold) * 0.1  
             allocated_bandwidth *= increase_factor
@@ -125,22 +132,22 @@ def update(frame):
     color = get_slice_color(slice_type)
 
     if container_port in container_positions:
-        # **First Prediction (Predict1)**
         user_data_1 = user[input_columns_1].to_dict()
         future1 = executor.submit(send_data_to_container, user_data_1, container_port, 'predict1')
         prediction1 = future1.result()
         new_resource_allocation = prediction1.get('prediction', ['Error'])[0] if prediction1 else 'Error'
 
-        # **Second Prediction (Predict2)**
         adjusted_signal_strength = user['Signal_Strength'] - abs(user['Updated_Signal_Strength'] - user['Signal_Strength'])
         user_data_2 = user[input_columns_2].to_dict()
-        user_data_2['Resource_Allocation'] = new_resource_allocation
         user_data_2['Updated_Signal_Strength'] = adjusted_signal_strength
         user_data_2['Required_Bandwidth'] *= 0.8
+        user_data_2['Resource_Allocation'] = new_resource_allocation
+
         future2 = executor.submit(send_data_to_container, user_data_2, container_port, 'predict2')
         prediction2 = future2.result()
         new_allocated_bandwidth = prediction2.get('prediction', ['Error'])[0] if prediction2 else 'Error'
-        new_allocated_bandwidth = enforce_qos(slice_type, new_allocated_bandwidth,user_data_2['Updated_Latency'])
+        
+        new_allocated_bandwidth = enforce_qos(slice_type, new_allocated_bandwidth, user_data_2['Updated_Latency'])
 
         container_id = list(container_positions.keys()).index(container_port)
         log_to_blockchain(user_id, new_allocated_bandwidth, container_id)
@@ -172,9 +179,28 @@ def update(frame):
         file_exists = os.path.exists(output_file)
         pd.DataFrame([result_data]).to_csv(output_file, mode='a', header=not file_exists, index=False)
 
+    # If it's the last frame, close the plot and save the figure
+    if frame == len(df) - 1:
+        # Save the final graph with the name from OUTPUT_FILE
+        graphs_folder = "graphs/mec"
+        if not os.path.exists(graphs_folder):
+            os.makedirs(graphs_folder)
+        
+        final_graph_path = os.path.join(graphs_folder, 'mec_'+output_file_name + '.png')  # Save as .png
+        plt.savefig(final_graph_path)
+        print(f"Final graph saved at {final_graph_path}")
+        
+        plt.close()
+
 handles = [plt.Line2D([0], [0], linestyle="dashed", linewidth=1, color=get_slice_color(slice_type), label=slice_type)
            for slice_type in ['eMBB', 'URLLC', 'mMTC']]
 ax.legend(handles=handles, loc='upper right')
 
+# Run animation and save it (only final frame as PNG)
 ani = animation.FuncAnimation(fig, update, frames=len(df), repeat=False, interval=200, blit=False)
-plt.show()
+
+# Save only the final frame as PNG
+ani.save(os.path.join('graphs/mec', f"mec_{output_file_name}_anim.png"), writer='pillow', fps=30)
+
+# Now close the plot
+plt.close()
