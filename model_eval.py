@@ -80,57 +80,60 @@ metrics_to_plot = ['MSE', 'RMSE', 'MAE', 'MAPE', 'R2', 'Completion_Time']
 # Set global font to Times New Roman
 plt.rcParams['font.family'] = 'Times New Roman'
 
-# Function to plot metrics for each target with top 3 outlined
-def plot_metrics(target_df, target_name):
+# Function to plot metrics for each target with proper highlighting and dynamic legend layout
+def plot_metrics(target_df, target_name, filter_o_models=False):
+    if filter_o_models:
+        target_df = target_df[target_df['Model'].str.startswith('O_')]
+    else:
+        target_df = target_df[~target_df['Model'].str.startswith('O_')]
+
+    if target_df.empty:
+        return  # Skip if no models match
+
     fig, axes = plt.subplots(2, 3, figsize=(18, 10))
     axes = axes.flatten()
 
-    # Define color palette
     palette = sns.color_palette("coolwarm", len(target_df['Model'].unique()))
     model_colors = dict(zip(target_df['Model'].unique(), palette))
 
     for i, metric in enumerate(metrics_to_plot):
         sorted_df = target_df.sort_values(by=metric, ascending=(metric != 'R2'))
         
-        sns.barplot(x='Model', y=metric, hue='Model', data=sorted_df, ax=axes[i], palette=model_colors, legend=False)
-        
-        # Increase title size and make it bold
-        axes[i].set_title(f'{metric}', fontsize=18, fontweight='bold')
+        ax = axes[i]
+        sns.barplot(x='Model', y=metric, hue='Model', data=sorted_df, ax=ax, palette=model_colors, legend=False)
+        ax.set_title(f'{metric}', fontsize=18, fontweight='bold')
+        ax.tick_params(axis='y', labelsize=14)
+        ax.set_ylabel('')
+        ax.set_xticklabels([])
+        ax.set_xlabel('')
 
-        # Increase y-axis tick size and remove y-axis label
-        axes[i].tick_params(axis='y', labelsize=14)
-        axes[i].set_ylabel('')  # Remove y-axis label
-
-        # Remove x-axis labels
-        axes[i].set_xticklabels([])
-        axes[i].set_xlabel('')
-
-        # Set y-axis limits for R² metric
         if metric == 'R2':
-            axes[i].set_ylim(0.65, 1)  # Adjust the range as needed
+            ax.set_ylim(0.65, 1)
+        highlight_count = 1 if filter_o_models else 4   
+        bars = [bar for bar in ax.patches[:highlight_count]]  # Select the first N bars
 
-        # Outline top 3 models
-        for j, bar in enumerate(axes[i].containers[0]):
-            if j < 3:
-                bar.set_edgecolor('black')
-                bar.set_linewidth(2)
+        # Highlight all bars
+        for bar in bars:
+            bar.set_edgecolor('black')
+            bar.set_linewidth(2)
 
-    # Create a legend with model names and colors
-    legend_patches = [mpatches.Patch(color=color, label=model) for model, color in model_colors.items()]
+    # Adjust legend with dynamic columns based on the flag
+    ncol_value = 4 if filter_o_models else 3
+    legend_patches = [mpatches.Patch(color=color, label=model.replace("O_", "")) for model, color in model_colors.items()]
     
-    # Adjust spacing to add gap between graphs and legend
-    fig.subplots_adjust(bottom=0.2)  # Increase bottom margin for legend
+    fig.subplots_adjust(bottom=0.2)
+    fig.legend(handles=legend_patches, loc="lower center", ncol=ncol_value, fontsize=22, frameon=False)
+    
+    plt.tight_layout(rect=[0, 0.12, 1, 1])
 
-    # Place the legend below the subplots with more spacing
-    fig.legend(handles=legend_patches, loc="lower center", ncol=3, fontsize=22, frameon=False)
-
-    plt.tight_layout(rect=[0, 0.12, 1, 1])  # Adjust layout, leaving more space for legend
-    plt.savefig(os.path.join(output_dir, f'{target_name}_model_metrics.png'))
+    suffix = "_Optimized" if filter_o_models else ""
+    plt.savefig(os.path.join(output_dir, f'{target_name}{suffix}_model_metrics.png'))
     plt.close()
     
-# Generate and save plots
 plot_metrics(final_results_df[final_results_df['Target'] == 'Resource_Allocation'], 'Resource_Allocation')
 plot_metrics(final_results_df[final_results_df['Target'] == 'Allocated_Bandwidth'], 'Allocated_Bandwidth')
+plot_metrics(final_results_df[final_results_df['Target'] == 'Resource_Allocation'], 'Resource_Allocation', filter_o_models=True)
+plot_metrics(final_results_df[final_results_df['Target'] == 'Allocated_Bandwidth'], 'Allocated_Bandwidth', filter_o_models=True)
 
 # Identify best models
 best_models = {}
@@ -149,4 +152,5 @@ for target in final_results_df['Target'].unique():
         row = df[df['Target'] == target]
         if not row.empty:
             row = row.iloc[0]
-            print(f"  {metric}: {row['Model']} ({row[metric]:.4f})")
+            model_name = row['Model'].replace("O_", "Optimized ")
+            print(f"  {metric}: {model_name} ({row[metric]:.4f})")
