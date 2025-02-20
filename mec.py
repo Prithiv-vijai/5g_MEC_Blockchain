@@ -99,10 +99,10 @@ input_columns_2 = ['Application_Type', 'Updated_Signal_Strength', 'Updated_Laten
 executor = ThreadPoolExecutor(max_workers=5)
 
 def enforce_qos(slice_type, allocated_bandwidth, latency):
-    if slice_type == 'URLLC' and latency > 20:
-        allocated_bandwidth *= 1 + ((latency - 20) / 20) * 0.2  
-    elif slice_type == 'eMBB' and allocated_bandwidth < 1000:
-        allocated_bandwidth *= 1 + ((1000 - allocated_bandwidth) / 1000) * 0.3  
+    if slice_type == 'URLLC' and latency > 10:
+        allocated_bandwidth *= 1 + ((latency - 10) / 10) * 0.1  
+    elif slice_type == 'eMBB' and allocated_bandwidth < 10000:
+        allocated_bandwidth *= 1 + ((10000 - allocated_bandwidth) / 10000) * 0.1  
     elif slice_type == 'mMTC' and allocated_bandwidth < 100:
         allocated_bandwidth *= 1 + ((100 - allocated_bandwidth) / 100) * 0.1  
     return allocated_bandwidth
