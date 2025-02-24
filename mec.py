@@ -48,8 +48,8 @@ def log_to_blockchain(user_id, allocated_bandwidth, container_id):
         web3.eth.default_account = accounts[container_id]
         tx_hash = contract.functions.addAllocation(int(user_id), int(float(allocated_bandwidth))).transact()
         web3.eth.wait_for_transaction_receipt(tx_hash)  # Ensure transaction completes
-    except:
-        pass  # Suppress blockchain errors
+    except Exception as e:
+        print(f"Error logging to blockchain: UserID={user_id}, ContainerID={container_id}, Error={e}")
 
 # Initialize progress bar
 progress_bar = tqdm(total=total_rows, desc="Processing Users", unit="user")
@@ -163,8 +163,8 @@ for frame in range(total_rows):
 
 progress_bar.close()  # ✅ Close progress bar after completion
 
-# Save final image
-plt.savefig(os.path.join('graphs/mec', f"mec_{output_file_name}.png"))
+# Save final image (uncomment if needed)
+# plt.savefig(os.path.join('graphs/mec', f"mec_{output_file_name}.png"))
 plt.close()
 
 print(f"✔ Processing for {input_file} to {output_file} completed successfully.")
