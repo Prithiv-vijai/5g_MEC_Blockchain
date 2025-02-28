@@ -7,6 +7,10 @@ from sklearn.cluster import KMeans
 num_containers = int(os.environ.get("NUM_CONTAINERS", 10))  # Default: 10 containers
 output_folder = os.environ.get("OUTPUT_FOLDER", "output")  # Default: 'output' directory
 output_file = os.environ.get("OUTPUT_FILE", "clustered_user_data.csv")  # Default: 'clustered_user_data.csv'
+# Constants
+frequency = 2.4e9  # 2.4 GHz in Hz (WiFi frequency)
+K = 32.45  # Constant for 1 GHz and 1 meter
+speed_of_light = 3.0e8  # Speed of light in m/s
 
 # Ensure output directory exists
 os.makedirs(output_folder, exist_ok=True)
@@ -54,17 +58,28 @@ df['y_coordinate'] = 198 * (y - y.min()) / (y.max() - y.min()) - 99
 scaling_factor = 0.75
 reference_factor = 0.26
 
-# Apply the transformation to update Signal Strength and Latency based on the new distance
+
+# Reverse Calculation Functions
+def calculate_signal_strength(d, f=frequency, k=K):
+    if d > 0:
+        return -(20 * np.log10(d) + 20 * np.log10(f) + k)
+    return np.nan
+
+def calculate_latency(d, speed=speed_of_light):
+    if d > 0:
+        return (d / speed) * 1000  # Latency in ms
+    return np.nan
+
+# Apply the reverse calculations
 df['Updated_Signal_Strength'] = df.apply(
-    lambda row: row['Signal_Strength'] * (row['New_Distance'] / row['Distance_meters']) ** reference_factor
-    if row['New_Distance'] != 0 else row['Signal_Strength'], axis=1
+    lambda row: calculate_signal_strength(row['New_Distance']) if row['New_Distance'] > 0 else row['Signal_Strength'],
+    axis=1
 )
 
 df['Updated_Latency'] = df.apply(
-    lambda row: row['Latency'] * (row['New_Distance'] / row['Distance_meters']) ** scaling_factor
-    if row['Distance_meters'] != 0 else row['Latency'], axis=1
+    lambda row: calculate_latency(row['New_Distance']) if row['New_Distance'] > 0 else row['Latency'],
+    axis=1
 )
-
 # Sort dataset by User_ID
 df = df.sort_values(by='User_ID')
 

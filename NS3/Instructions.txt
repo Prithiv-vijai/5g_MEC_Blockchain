@@ -25,154 +25,111 @@ nano scratch/mec_simulation.cc
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-OLD DISTANCE GENERATION CODE :
+NEW FriisPropagationLossModel based CODE :
 
 #include "ns3/core-module.h"
 #include "ns3/mobility-module.h"
-#include "ns3/network-module.h"
-#include "ns3/internet-module.h"
 #include "ns3/propagation-module.h"
+#include "ns3/log.h"
+#include "ns3/vector.h"
+#include "ns3/constant-position-mobility-model.h"
+#include "ns3/internet-module.h"
+#include "ns3/point-to-point-module.h"
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <string>
-#include <vector>
+#include <cmath>
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE("MecSimulation");
+NS_LOG_COMPONENT_DEFINE("RealMecSimulation");
 
-// Path loss parameters
-const double referenceSignalStrength = -50.0; // Signal strength at reference distance (dB)
-const double pathLossExponent = 3.0; // Path loss exponent (can be adjusted based on environment)
-
-// Function to calculate distance based on signal strength (dB)
-double CalculateDistanceFromSignalStrength(double signalStrength) {
-    double distance = pow(10, (signalStrength - referenceSignalStrength) / (10 * pathLossExponent));
+// Function to calculate distance from signal strength using Friis Propagation Loss Model
+double CalculateDistanceFromSignalStrength(double signalStrength, double frequency)
+{
+    Ptr<FriisPropagationLossModel> model = CreateObject<FriisPropagationLossModel>();
+    double rxPowerW = std::pow(10.0, signalStrength / 10.0) * 1e-3; // dBm to Watts
+    double distance = model->CalcDistance(rxPowerW, frequency);
     return distance;
 }
 
-// Function to normalize coordinates to range [0, 99]
-double NormalizeCoordinate(double value, double min, double max) {
-    return ((value - min) / (max - min)) * 99;
+// Function to calculate distance from latency
+double CalculateDistanceFromLatency(double latency)
+{
+    const double speedOfLight = 3.0e8; // meters per second
+    double latencyInSeconds = latency / 1000.0; // Convert ms to seconds
+    double distance = latencyInSeconds * speedOfLight;
+    return distance;
 }
 
-// Function to export coordinates to CSV
-void exportCoordinatesToCSV(std::vector<Ptr<Node>> nodes) {
-    std::ofstream outputFile("/mnt/c/Users/prith/OneDrive/Desktop/phase II/coordinates_normalized.csv");
-    if (!outputFile.is_open()) {
-        NS_LOG_ERROR("Failed to open output file for coordinates.");
-        return;
-    }
-
-    // Write the header to the CSV file
-    outputFile << "User_ID,X,Y\n";
-
-    for (size_t i = 0; i < nodes.size(); ++i) {
-        Ptr<Node> node = nodes[i];
-        Ptr<ConstantPositionMobilityModel> mobilityModel = node->GetObject<ConstantPositionMobilityModel>();
-        if (mobilityModel) {
-            Vector position = mobilityModel->GetPosition();
-            
-            // Normalize the X and Y coordinates
-            double normalizedX = NormalizeCoordinate(position.x, 0.0, 0.23);
-            double normalizedY = NormalizeCoordinate(position.y, 0.0, 0.23);
-            
-            outputFile << i + 1 << "," << normalizedX << "," << normalizedY << "\n";
-        }
-    }
-
-    outputFile.close();
-}
-
-// Function to read dataset and run the simulation
-void readDatasetAndRunSimulation() {
-    // Open the dataset CSV file
-    std::ifstream file("/mnt/c/Users/prith/OneDrive/Desktop/5G_MEC_Blockchain/NS3/augmented_dataset.csv");
-    if (!file.is_open()) {
-        NS_LOG_ERROR("Failed to open dataset file.");
-        return;
-    }
-
+// Function to process the dataset and calculate distances
+void ProcessDataset(const std::string &inputFile, const std::string &outputFile)
+{
+    std::ifstream inFile(inputFile);
+    std::ofstream outFile(outputFile);
     std::string line;
-    int userIndex = 0;
 
-    // Skip the header
-    std::getline(file, line);
-
-    // Read each line from the file and process it
-    std::vector<Ptr<Node>> nodeVec;
-    while (std::getline(file, line)) {
-        // Create nodes dynamically based on the number of users
-        if (userIndex >= nodeVec.size()) {
-            Ptr<Node> newNode = CreateObject<Node>();
-            nodeVec.push_back(newNode);
-        }
-
-        std::stringstream ss(line);
-        std::string userId, appType, signalStrength, latency, reqBandwidth, allocBandwidth, resourceAlloc;
-
-        // Read each value from the line
-        std::getline(ss, userId, ',');
-        std::getline(ss, appType, ',');
-        std::getline(ss, signalStrength, ',');
-        std::getline(ss, latency, ',');
-        std::getline(ss, reqBandwidth, ',');
-        std::getline(ss, allocBandwidth, ',');
-        std::getline(ss, resourceAlloc, ',');
-
-        // Log parsed data to ensure correct values
-        NS_LOG_INFO("User " << userIndex << " - signalStrength: " << signalStrength
-                            << ", allocBandwidth: " << allocBandwidth);
-
-        // Convert signal strength to double and calculate distance
-        double signalStrengthValue = std::stod(signalStrength);
-        double distance = CalculateDistanceFromSignalStrength(signalStrengthValue);
-
-        // Check if the node exists before proceeding
-        Ptr<Node> node = nodeVec[userIndex];
-        if (node == nullptr) {
-            NS_LOG_ERROR("Node " << userIndex << " is null. Skipping.");
-            continue;
-        }
-
-        // Create mobility model for this user
-        MobilityHelper userMobility;
-        userMobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
-        userMobility.Install(node); // Install mobility on the current node
-
-        // Set position based on calculated distance (assuming distance is the radial distance from origin)
-        double x = distance;  // Example logic for X position
-        double y = distance / 2.0;  // Example logic for Y position (can be adjusted)
-        double z = 0.0;  // Static Z position
-
-        Ptr<ConstantPositionMobilityModel> mobilityModel = node->GetObject<ConstantPositionMobilityModel>();
-        if (mobilityModel) {
-            mobilityModel->SetPosition(Vector(x, y, z));  // Set the position
-        }
-
-        userIndex++;
+    if (!inFile.is_open()) {
+        std::cerr << "Error opening input file." << std::endl;
+        return;
     }
 
-    file.close();
+    if (!outFile.is_open()) {
+        std::cerr << "Error opening output file." << std::endl;
+        return;
+    }
 
-    // Export coordinates to CSV
-    exportCoordinatesToCSV(nodeVec);
+    outFile << "User_ID,Distance" << std::endl;
+    std::getline(inFile, line); // Skip header
 
-    NS_LOG_INFO("Simulation complete.");
+    while (std::getline(inFile, line)) {
+        std::istringstream iss(line);
+        std::string userIdStr, appTypeStr, signalStrengthStr, latencyStr;
+
+        std::getline(iss, userIdStr, ',');
+        std::getline(iss, appTypeStr, ',');
+        std::getline(iss, signalStrengthStr, ',');
+        std::getline(iss, latencyStr, ',');
+
+        try {
+            double signalStrength = std::stod(signalStrengthStr);
+            double latency = std::stod(latencyStr);
+            double frequency = 2.4e9; // 2.4 GHz WiFi frequency
+
+            double distanceFromSignal = CalculateDistanceFromSignalStrength(signalStrength, frequency);
+            double distanceFromLatency = CalculateDistanceFromLatency(latency);
+            double combinedDistance = (distanceFromSignal + distanceFromLatency) / 2.0;
+
+            outFile << userIdStr << "," << combinedDistance << std::endl;
+        }
+        catch (const std::exception &e) {
+            std::cerr << "Error processing line: " << line << " - " << e.what() << std::endl;
+        }
+    }
+
+    inFile.close();
+    outFile.close();
 }
 
-int main(int argc, char *argv[]) {
-    // Set up logging
-    LogComponentEnable("MecSimulation", LOG_LEVEL_INFO);
+int main(int argc, char *argv[])
+{
+    CommandLine cmd;
+    std::string inputFile = "input.csv";
+    std::string outputFile = "output.csv";
+    cmd.AddValue("input", "Input dataset file", inputFile);
+    cmd.AddValue("output", "Output dataset file", outputFile);
+    cmd.Parse(argc, argv);
 
-    // Run the dataset processing and simulation
-    readDatasetAndRunSimulation();
+    NS_LOG_INFO("Starting Real MEC Simulation...");
+    ProcessDataset(inputFile, outputFile);
+    NS_LOG_INFO("Simulation Completed. Output saved to " << outputFile);
 
     return 0;
 }
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-NEW NS3 BASED CODE :
+OLD CODE :
 
 #include "ns3/core-module.h"
 #include "ns3/mobility-module.h"
