@@ -124,8 +124,7 @@ for frame in range(total_rows):
         new_resource_allocation = prediction1.get('prediction', ['Error'])[0] if prediction1 else 'Error'
         user_data_2 = user[input_columns_2].to_dict()
         
-
-        
+   
         
         user_data_2['Resource_Allocation'] = new_resource_allocation
 

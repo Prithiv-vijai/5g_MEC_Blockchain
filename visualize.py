@@ -59,7 +59,7 @@ data = {edge_count: pd.read_csv(os.path.join(post_data_folder, file)) for edge_c
 edge_counts = sorted(data.keys(), key=int)  # Sort numerically: ['3', '5', '7', '10']
 
 # Compute statistics for resource allocation analysis
-avg_old_res_alloc = data["3"]["Old_Resource_Allocation"].mean() - 6
+avg_old_res_alloc = data["3"]["Old_Resource_Allocation"].mean() 
 avg_new_res_alloc = [data[edge]["New_Resource_Allocation"].mean() for edge in edge_counts]
 boost_percentage = [(val - avg_old_res_alloc) / avg_old_res_alloc * 100 for val in avg_new_res_alloc]
 
