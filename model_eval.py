@@ -5,9 +5,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import train_test_split, cross_val_predict, KFold
 from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, HistGradientBoostingRegressor
 import xgboost as xgb
 import lightgbm as lgb
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor, HistGradientBoostingRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import make_pipeline
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, mean_absolute_percentage_error
 import time
 import matplotlib.patches as mpatches
@@ -26,7 +30,9 @@ models = {
     'Gradient Boosting': GradientBoostingRegressor(random_state=42),
     'XGBoost': xgb.XGBRegressor(random_state=42),
     'Hgbrt': HistGradientBoostingRegressor(random_state=42),
-    'LightGBM': lgb.LGBMRegressor(random_state=42, verbose=-1)
+    'LightGBM': lgb.LGBMRegressor(random_state=42, verbose=-1),
+    'AdaBoost': AdaBoostRegressor(random_state=42),
+    'Polynomial Regression': make_pipeline(PolynomialFeatures(degree=2), LinearRegression())
 }
 
 # Cross-validation setup
@@ -80,7 +86,6 @@ metrics_to_plot = ['MSE', 'RMSE', 'MAE', 'MAPE', 'R2', 'Completion_Time']
 # Set global font to Times New Roman
 plt.rcParams['font.family'] = 'Times New Roman'
 
-# Function to plot metrics for each target with proper highlighting and dynamic legend layout
 def plot_metrics(target_df, target_name, filter_o_models=False):
     if filter_o_models:
         target_df = target_df[target_df['Model'].str.startswith('O_')]
@@ -90,7 +95,7 @@ def plot_metrics(target_df, target_name, filter_o_models=False):
     if target_df.empty:
         return  # Skip if no models match
 
-    fig, axes = plt.subplots(2, 3, figsize=(18, 10))
+    fig, axes = plt.subplots(2, 3, figsize=(16, 10), dpi=300)  # Increased DPI for high resolution
     axes = axes.flatten()
 
     palette = sns.color_palette("coolwarm", len(target_df['Model'].unique()))
@@ -98,36 +103,47 @@ def plot_metrics(target_df, target_name, filter_o_models=False):
 
     for i, metric in enumerate(metrics_to_plot):
         sorted_df = target_df.sort_values(by=metric, ascending=(metric != 'R2'))
-        
+
         ax = axes[i]
         sns.barplot(x='Model', y=metric, hue='Model', data=sorted_df, ax=ax, palette=model_colors, legend=False)
-        ax.set_title(f'{metric}', fontsize=18, fontweight='bold')
-        ax.tick_params(axis='y', labelsize=14)
+        ax.set_title(f'{metric}', fontsize=28, fontweight='bold')
+        ax.tick_params(axis='y', labelsize=22)
         ax.set_ylabel('')
         ax.set_xticklabels([])
         ax.set_xlabel('')
 
         if metric == 'R2':
             ax.set_ylim(0.65, 1)
-        highlight_count = 1 if filter_o_models else 4   
-        bars = [bar for bar in ax.patches[:highlight_count]]  # Select the first N bars
 
-        # Highlight all bars
+        highlight_count = 1 if filter_o_models else 4
+        bars = [bar for bar in ax.patches[:highlight_count]]
+
         for bar in bars:
             bar.set_edgecolor('black')
             bar.set_linewidth(2)
 
-    # Adjust legend with dynamic columns based on the flag
-    ncol_value = 4 if filter_o_models else 3
+    # Adjust legend with different spacing based on the number of legends
+    ncol_value = 2 if filter_o_models else 3  # 4 for optimized (1 row), 3 for non-optimized (3 rows)
     legend_patches = [mpatches.Patch(color=color, label=model.replace("O_", "")) for model, color in model_colors.items()]
-    
-    fig.subplots_adjust(bottom=0.2)
-    fig.legend(handles=legend_patches, loc="lower center", ncol=ncol_value, fontsize=22, frameon=False)
-    
-    plt.tight_layout(rect=[0, 0.12, 1, 1])
 
+    # Adjust the bottom margin and legend placement for optimized vs non-optimized models
+    if filter_o_models:
+        fig.subplots_adjust(bottom=0.40, top=0.90)  # More space for optimized models (1 row)
+    else:
+        fig.subplots_adjust(bottom=0.20, top=0.85)  # More space for non-optimized models (multiple rows)
+
+    # Adjust the position of the legend to ensure it doesn't overlap with the plot
+    if filter_o_models:
+        fig.legend(handles=legend_patches, loc="lower center", ncol=ncol_value, fontsize=34, frameon=False, bbox_to_anchor=(0.5, -0.15))
+    else:
+        fig.legend(handles=legend_patches, loc="lower center", ncol=ncol_value, fontsize=34, frameon=False, bbox_to_anchor=(0.5, -0.25))  # Place lower for non-optimized models
+
+    plt.tight_layout(rect=[0, 0, 1, 1])  # No extra space for title
+
+    # Save image with high quality
     suffix = "_Optimized" if filter_o_models else ""
-    plt.savefig(os.path.join(output_dir, f'{target_name}{suffix}_model_metrics.png'))
+    plt.savefig(os.path.join(output_dir, f'{target_name}{suffix}_model_metrics.png'), dpi=300, bbox_inches='tight')
+
     plt.close()
     
 plot_metrics(final_results_df[final_results_df['Target'] == 'Resource_Allocation'], 'Resource_Allocation')

@@ -93,7 +93,7 @@ def send_data_to_container(user_data, container_port, endpoint):
     except:
         return None
 
-input_columns_1 = ['Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth']
+input_columns_1 = ['Application_Type','Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth']
 input_columns_2 = ['Application_Type', 'Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth', 'Resource_Allocation']
 
 executor = ThreadPoolExecutor(max_workers=5)
@@ -124,10 +124,7 @@ for frame in range(total_rows):
         new_resource_allocation = prediction1.get('prediction', ['Error'])[0] if prediction1 else 'Error'
         user_data_2 = user[input_columns_2].to_dict()
         
-        #To TEST , remove while execution
-        adjusted_signal_strength = user['Signal_Strength'] - abs(user['Updated_Signal_Strength'] - user['Signal_Strength'])
-        user_data_2['Updated_Signal_Strength'] = adjusted_signal_strength
-        user_data_2['Required_Bandwidth'] *= 0.8
+
         
         
         user_data_2['Resource_Allocation'] = new_resource_allocation

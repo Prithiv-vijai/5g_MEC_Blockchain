@@ -23,7 +23,7 @@ OUTPUT_FOLDER="output/pre/"
 POST_OUTPUT_FOLDER="output/post"
 
 # Define cluster sizes (modifiable)
-CLUSTER_SIZES="3,5,7,10"
+CLUSTER_SIZES="3"
 
 # Convert cluster sizes string into an array
 IFS=',' read -r -a CLUSTER_LIST <<< "$CLUSTER_SIZES"
@@ -124,16 +124,16 @@ echo -e "${CYAN}═════════════════════�
 # ================================
 # STEP 4: Visualization
 # ================================
-echo -e "\n${CYAN}═════════════════════════════════════════════════════════${NC}"
-echo -e "▶ ${CYAN}STARTING VISUALIZATION PROCESS${NC}"
-echo -e "${CYAN}═════════════════════════════════════════════════════════${NC}"
+# echo -e "\n${CYAN}═════════════════════════════════════════════════════════${NC}"
+# echo -e "▶ ${CYAN}STARTING VISUALIZATION PROCESS${NC}"
+# echo -e "${CYAN}═════════════════════════════════════════════════════════${NC}"
 
-python visualize.py
-if [[ $? -eq 0 ]]; then
-    echo -e "✔ ${GREEN}Visualization completed successfully.${NC}"
-else
-    echo -e "✖ ${RED}Visualization failed.${NC}"
-    exit 1
-fi
+# python visualize.py
+# if [[ $? -eq 0 ]]; then
+#     echo -e "✔ ${GREEN}Visualization completed successfully.${NC}"
+# else
+#     echo -e "✖ ${RED}Visualization failed.${NC}"
+#     exit 1
+# fi
 
-echo -e "\n✔ ${GREEN}All processes completed successfully.${NC}\n"
+# echo -e "\n✔ ${GREEN}All processes completed successfully.${NC}\n"

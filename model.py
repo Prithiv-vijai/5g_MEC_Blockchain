@@ -8,7 +8,7 @@ import time
 data = pd.read_csv('NS3/augmented_dataset.csv')
 
 # Define feature sets and targets
-X1 = data[['Signal_Strength', 'Latency', 'Required_Bandwidth']]
+X1 = data[['Application_Type','Signal_Strength', 'Latency', 'Required_Bandwidth']]
 y1 = data['Resource_Allocation']
 
 X2 = data[['Application_Type','Signal_Strength', 'Latency', 'Required_Bandwidth', 'Resource_Allocation']]  

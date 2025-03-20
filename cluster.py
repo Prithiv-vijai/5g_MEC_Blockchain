@@ -7,10 +7,7 @@ from sklearn.cluster import KMeans
 num_containers = int(os.environ.get("NUM_CONTAINERS", 10))  # Default: 10 containers
 output_folder = os.environ.get("OUTPUT_FOLDER", "output")  # Default: 'output' directory
 output_file = os.environ.get("OUTPUT_FILE", "clustered_user_data.csv")  # Default: 'clustered_user_data.csv'
-# Constants
-frequency = 2.4e9  # 2.4 GHz in Hz (WiFi frequency)
-K = 32.45  # Constant for 1 GHz and 1 meter
-speed_of_light = 3.0e8  # Speed of light in m/s
+
 
 # Ensure output directory exists
 os.makedirs(output_folder, exist_ok=True)
@@ -54,21 +51,48 @@ x, y = df['x_coordinate'], df['y_coordinate']
 df['x_coordinate'] = 198 * (x - x.min()) / (x.max() - x.min()) - 99
 df['y_coordinate'] = 198 * (y - y.min()) / (y.max() - y.min()) - 99
 
-# Define scaling factors for signal strength and latency adjustments based on distance
-scaling_factor = 0.75
-reference_factor = 0.26
 
 
-# Reverse Calculation Functions
-def calculate_signal_strength(d, f=frequency, k=K):
+
+# Constants for 5G mid-band (3.5 GHz)
+frequency = 3.5e9  # 3.5 GHz in Hz
+K = 36.6  # Reference path loss (dB) at d0 = 1 meter
+n = 2  # Path loss exponent for urban environment
+speed_of_light = 2.99e8  # Speed of light in m/s
+
+# Reverse Calculation Functions using LDPL
+def calculate_signal_strength(d, Pt=46, k=K, n=n):
+    """
+    Computes received signal strength using LDPL model.
+    
+    Parameters:
+        d (float): Distance in meters
+        Pt (float): Transmit power in dBm (default: 46 dBm for 5G macro tower)
+        k (float): Reference path loss at d0=1m (default: 36.6 dB)
+        n (float): Path loss exponent (default: 3.5 for urban)
+    
+    Returns:
+        float: Received signal strength (Pr) in dBm
+    """
     if d > 0:
-        return -(20 * np.log10(d) + 20 * np.log10(f) + k)
+        return Pt - (k + 10 * n * np.log10(d))
     return np.nan
 
 def calculate_latency(d, speed=speed_of_light):
+    """
+    Computes one-way latency based on distance.
+    
+    Parameters:
+        d (float): Distance in meters
+        speed (float): Speed of light in m/s
+    
+    Returns:
+        float: Latency in milliseconds
+    """
     if d > 0:
-        return (d / speed) * 1000  # Latency in ms
+        return (d / speed) * 1000  # Convert to ms
     return np.nan
+
 
 # Apply the reverse calculations
 df['Updated_Signal_Strength'] = df.apply(
