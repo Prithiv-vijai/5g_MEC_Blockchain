@@ -1,0 +1,23 @@
+NAME         CPU %     MEM USAGE / LIMIT
+edge_15      0.02%     121.9MiB / 512MiB
+prometheus   0.16%     29.23MiB / 7.463GiB
+edge_9       0.03%     124.8MiB / 512MiB
+edge_17      0.02%     120MiB / 512MiB
+edge_16      0.03%     122.8MiB / 512MiB
+edge_4       0.17%     121MiB / 512MiB
+edge_19      0.02%     121.9MiB / 512MiB
+grafana      1.12%     76.88MiB / 7.463GiB
+edge_3       0.03%     124.8MiB / 512MiB
+edge_13      0.02%     124.4MiB / 512MiB
+edge_14      0.02%     122.4MiB / 512MiB
+edge_20      0.02%     121.9MiB / 512MiB
+edge_5       0.02%     122.9MiB / 512MiB
+edge_11      0.02%     124.9MiB / 512MiB
+edge_7       0.02%     120.7MiB / 512MiB
+edge_6       0.03%     128.7MiB / 512MiB
+edge_1       0.02%     125.3MiB / 512MiB
+edge_12      0.03%     122.7MiB / 512MiB
+edge_18      0.02%     121.9MiB / 512MiB
+edge_8       0.02%     123MiB / 512MiB
+edge_2       0.02%     122.9MiB / 512MiB
+edge_10      0.02%     122.6MiB / 512MiB

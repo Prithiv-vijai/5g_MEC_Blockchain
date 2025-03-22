@@ -16,8 +16,9 @@ COPY requirements.txt ./
 # Install required dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose the port that Flask will run on
-EXPOSE 5000
+# Expose the ports that Flask and Prometheus will run on
+EXPOSE 5000  
+EXPOSE 8000  
 
 # Run the Flask app
 CMD ["python", "app.py"]

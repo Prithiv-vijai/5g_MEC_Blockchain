@@ -10,3 +10,4 @@ xgboost
 flask
 lightgbm
 requests
+prometheus_client

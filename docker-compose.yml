@@ -6,7 +6,13 @@ services:
     environment:
       - FROM_ADDRESS=0xE4f49a1b5A95248E4Bd70FD7c695C78F8F33C462
     ports:
-      - "5001:5000"
+      - "5001:5000"  # Flask app port
+      - "8001:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'  # Limit CPU usage
+          memory: 512M  # Limit memory usage
 
   edge_2:
     container_name: edge_2
@@ -14,7 +20,13 @@ services:
     environment:
       - FROM_ADDRESS=0x83233b891ad0027ac9f202c42583FA44Eea083D6
     ports:
-      - "5002:5000"
+      - "5002:5000"  # Flask app port
+      - "8002:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
   edge_3:
     container_name: edge_3
@@ -22,7 +34,13 @@ services:
     environment:
       - FROM_ADDRESS=0x5a6625a828639A85d79c7a9180A2900445A5E888
     ports:
-      - "5003:5000"
+      - "5003:5000"  # Flask app port
+      - "8003:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
   edge_4:
     container_name: edge_4
@@ -30,7 +48,13 @@ services:
     environment:
       - FROM_ADDRESS=0x8AA17D31130840B6C6ff6735EDe272fd3b87199f
     ports:
-      - "5004:5000"
+      - "5004:5000"  # Flask app port
+      - "8004:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
   edge_5:
     container_name: edge_5
@@ -38,7 +62,13 @@ services:
     environment:
       - FROM_ADDRESS=0x9a70841C7dFA84Fd719b0B982D689d9538f669Ce
     ports:
-      - "5005:5000"
+      - "5005:5000"  # Flask app port
+      - "8005:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
   edge_6:
     container_name: edge_6
@@ -46,7 +76,13 @@ services:
     environment:
       - FROM_ADDRESS=0xc39726DFd3F6EaeE7928BFC35636e6e029eb39a5
     ports:
-      - "5006:5000"
+      - "5006:5000"  # Flask app port
+      - "8006:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
   edge_7:
     container_name: edge_7
@@ -54,7 +90,13 @@ services:
     environment:
       - FROM_ADDRESS=0x6B6622e32771b5BC2257bd80e992bE5304F90348
     ports:
-      - "5007:5000"
+      - "5007:5000"  # Flask app port
+      - "8007:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
   edge_8:
     container_name: edge_8
@@ -62,7 +104,13 @@ services:
     environment:
       - FROM_ADDRESS=0x365Ff6CcF386222F7EeFC28923c8eaEE459A89f5
     ports:
-      - "5008:5000"
+      - "5008:5000"  # Flask app port
+      - "8008:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
   edge_9:
     container_name: edge_9
@@ -70,7 +118,13 @@ services:
     environment:
       - FROM_ADDRESS=0x266365AB6b31060cc4863e353d314fb79e49f46f
     ports:
-      - "5009:5000"
+      - "5009:5000"  # Flask app port
+      - "8009:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
   edge_10:
     container_name: edge_10
@@ -78,4 +132,170 @@ services:
     environment:
       - FROM_ADDRESS=0xa959A684245735dd4E517F41445e393074C834FF
     ports:
-      - "5010:5000"
+      - "5010:5000"  # Flask app port
+      - "8010:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # Add 10 more edge nodes (edge_11 to edge_20)
+  edge_11:
+    container_name: edge_11
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0x...  # Replace with a unique Ethereum address
+    ports:
+      - "5011:5000"  # Flask app port
+      - "8011:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  edge_12:
+    container_name: edge_12
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0x...  # Replace with a unique Ethereum address
+    ports:
+      - "5012:5000"  # Flask app port
+      - "8012:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  edge_13:
+    container_name: edge_13
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0x...  # Replace with a unique Ethereum address
+    ports:
+      - "5013:5000"  # Flask app port
+      - "8013:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  edge_14:
+    container_name: edge_14
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0x...  # Replace with a unique Ethereum address
+    ports:
+      - "5014:5000"  # Flask app port
+      - "8014:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  edge_15:
+    container_name: edge_15
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0x...  # Replace with a unique Ethereum address
+    ports:
+      - "5015:5000"  # Flask app port
+      - "8015:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  edge_16:
+    container_name: edge_16
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0x...  # Replace with a unique Ethereum address
+    ports:
+      - "5016:5000"  # Flask app port
+      - "8016:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  edge_17:
+    container_name: edge_17
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0x...  # Replace with a unique Ethereum address
+    ports:
+      - "5017:5000"  # Flask app port
+      - "8017:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  edge_18:
+    container_name: edge_18
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0x...  # Replace with a unique Ethereum address
+    ports:
+      - "5018:5000"  # Flask app port
+      - "8018:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  edge_19:
+    container_name: edge_19
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0x...  # Replace with a unique Ethereum address
+    ports:
+      - "5019:5000"  # Flask app port
+      - "8019:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  edge_20:
+    container_name: edge_20
+    image: lightgbm-container:latest
+    environment:
+      - FROM_ADDRESS=0x...  # Replace with a unique Ethereum address
+    ports:
+      - "5020:5000"  # Flask app port
+      - "8020:8000"  # Metrics port for Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+volumes:
+  grafana-storage:
