@@ -46,6 +46,18 @@ params_model2 = {
     'metric': 'rmse'
 }
 
+params2 = {
+    'num_leaves': 36,
+    'n_estimators': 250,
+    'learning_rate': 0.0574839202340978,
+    'max_depth': 31,
+    'min_data_in_leaf': 29,
+    'lambda_l1': 3.0,
+    'lambda_l2': 2.4736452819302365,
+    'objective': 'regression',
+    'metric': 'rmse'
+}
+
 # Train Model 1 (Allocated Bandwidth prediction)
 print("\nTraining Model 1 (Allocated Bandwidth prediction)...")
 model1 = lgb.LGBMRegressor(**params_model1)
