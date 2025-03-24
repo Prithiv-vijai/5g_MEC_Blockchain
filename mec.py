@@ -25,7 +25,7 @@ with open('mec_config.json', 'r') as config_file:
     config = json.load(config_file)
 
 # Load dataset
-df = pd.read_csv(input_file, nrows=200)
+df = pd.read_csv(input_file)
 total_rows = len(df)
 
 # # Blockchain setup

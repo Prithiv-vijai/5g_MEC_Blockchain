@@ -4,16 +4,19 @@ import re
 import time
 import threading
 
-# Define directories
-INPUT_DIR = "output/pre/divisive"
-OUTPUT_DIR = "output/post/divisive"
-METRICS_DIR = "output/metrics/divisive"
-DOCKER_METRICS_DIR = "output/docker_metrics/divisive"
+# Define the base directories
+BASE_INPUT_DIR = "output/pre"
+BASE_OUTPUT_DIR = "output/post"
+BASE_METRICS_DIR = "output/metrics"
+BASE_DOCKER_METRICS_DIR = "output/docker_metrics"
 
-# Ensure output and metrics directories exist
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-os.makedirs(METRICS_DIR, exist_ok=True)
-os.makedirs(DOCKER_METRICS_DIR, exist_ok=True)
+# List of folders to process
+FOLDERS = ["kmeans", "hierarchical", "divisive", "gmm", "dbscan", "meanshift", "optics"]
+
+# Ensure base output and metrics directories exist
+os.makedirs(BASE_OUTPUT_DIR, exist_ok=True)
+os.makedirs(BASE_METRICS_DIR, exist_ok=True)
+os.makedirs(BASE_DOCKER_METRICS_DIR, exist_ok=True)
 
 def get_edge_count(input_file):
     """Extract the number of edges from the filename (e.g., 3_cluster.csv -> 3)."""
@@ -83,7 +86,18 @@ def fetch_metrics_with_retry(metrics_url, retries=3, delay=2):
         time.sleep(delay)  # Wait before retrying
     return None  # Return None if all attempts fail
 
-def main():
+def process_folder(folder):
+    """Process a single folder."""
+    INPUT_DIR = os.path.join(BASE_INPUT_DIR, folder)
+    OUTPUT_DIR = os.path.join(BASE_OUTPUT_DIR, folder)
+    METRICS_DIR = os.path.join(BASE_METRICS_DIR, folder)
+    DOCKER_METRICS_DIR = os.path.join(BASE_DOCKER_METRICS_DIR, folder)
+
+    # Ensure output and metrics directories exist
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    os.makedirs(METRICS_DIR, exist_ok=True)
+    os.makedirs(DOCKER_METRICS_DIR, exist_ok=True)
+
     # Loop through all cluster CSV files in the input directory
     for input_file in os.listdir(INPUT_DIR):
         if input_file.endswith("_cluster.csv"):
@@ -162,8 +176,14 @@ def main():
                 print(f"✅ Docker metrics saved to {docker_metrics_file}")
             else:
                 print(f"❌ Failed to create {output_file}")
+
+def main():
+    # Loop through each folder and process it
+    for folder in FOLDERS:
+        print(f"Processing folder: {folder}")
+        process_folder(folder)
     
-    print("All files processed.")
+    print("All folders processed.")
 
 if __name__ == "__main__":
     main()
