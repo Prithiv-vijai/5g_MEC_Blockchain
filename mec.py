@@ -1,17 +1,14 @@
 import os
 import requests
 import pandas as pd
-from web3 import Web3
-import json
 from concurrent.futures import ThreadPoolExecutor
-from tqdm import tqdm  # Import tqdm for progress bar
+from tqdm import tqdm
 
 # Fetch environment variables
 input_file = os.environ.get('INPUT_FILE')
 output_folder = os.environ.get('OUTPUT_FOLDER')
 output_file_name = os.environ.get('OUTPUT_FILE')
 output_file = os.path.join(output_folder, output_file_name)
-output_file_name = output_file_name[:-4]
 
 # Ensure directory exists
 os.makedirs('graphs/mec', exist_ok=True)
@@ -20,121 +17,88 @@ os.makedirs('graphs/mec', exist_ok=True)
 if os.path.exists(output_file):
     os.remove(output_file)
 
-# Load configuration
-with open('mec_config.json', 'r') as config_file:
-    config = json.load(config_file)
-
 # Load dataset
 df = pd.read_csv(input_file)
 total_rows = len(df)
 
-# # Blockchain setup
-# GANACHE_URL = config['ganache_url']
-# web3 = Web3(Web3.HTTPProvider(GANACHE_URL))
-# accounts = web3.eth.accounts[:10]
-# contract_address = config['contract_address']
-# abi = config['abi']
-# contract = web3.eth.contract(address=contract_address, abi=abi)
-
-
-
-# def log_to_blockchain(user_id, allocated_bandwidth, container_id):
-#     try:
-#         web3.eth.default_account = accounts[container_id]
-#         tx_hash = contract.functions.addAllocation(int(user_id), int(float(allocated_bandwidth))).transact()
-#         web3.eth.wait_for_transaction_receipt(tx_hash)  # Ensure transaction completes
-#     except Exception as e:
-#         print(f"Error logging to blockchain: UserID={user_id}, ContainerID={container_id}, Error={e}")
-
 # Initialize progress bar
 progress_bar = tqdm(total=total_rows, desc="Processing Users", unit="user")
 
-# Compute container positions
-container_positions = df.groupby('Assigned_Edge_Node')[['x_coordinate', 'y_coordinate']].mean().to_dict(orient='index')
-
-def send_data_to_container(user_data, container_port, endpoint):
-    url = f'http://localhost:{container_port}/{endpoint}'
-    try:
-        response = requests.post(url, json=user_data)
-        response.raise_for_status()
-        return response.json()
-    except:
-        return None
-
+# Define columns for input
 input_columns_1 = ['Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth']
 input_columns_2 = ['Application_Type', 'Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth', 'Allocated_Bandwidth']
 
 executor = ThreadPoolExecutor(max_workers=5)
 
-def enforce_qos(slice_type, allocated_bandwidth, latency):
-    if slice_type == 'URLLC' and latency > 10:
-        allocated_bandwidth *= 1 + ((latency - 10) / 10) * 0.1  
-    elif slice_type == 'eMBB' and allocated_bandwidth < 10000:
-        allocated_bandwidth *= 1 + ((10000 - allocated_bandwidth) / 10000) * 0.1  
-    elif slice_type == 'mMTC' and allocated_bandwidth < 100:
-        allocated_bandwidth *= 1 + ((100 - allocated_bandwidth) / 100) * 0.1  
-    return allocated_bandwidth
+def send_data_to_container(user_data_1, user_data_2, slice_type, updated_latency, signal_strength, updated_signal_strength, container_port):
+    """Send data to container for processing."""
+    url = f'http://localhost:{container_port}/predict'
+    payload = {
+        'user_data_1': user_data_1,
+        'user_data_2': user_data_2,
+        'slice_type': slice_type,
+        'updated_latency': updated_latency,
+        'signal_strength': signal_strength,
+        'updated_signal_strength': updated_signal_strength
+    }
+    try:
+        response = requests.post(url, json=payload)
+        response.raise_for_status()
+        return response.json()
+    except Exception as e:
+        print(f"Error sending data to container: {e}")
+        return None
 
 # Process users with a loop
 for frame in range(total_rows):
     user = df.iloc[frame]
     user_id = user['User_ID']
     container_port = int(user['Assigned_Edge_Node'])
-
     slice_type = str(user['Network_Slice']).strip()
 
-    if container_port in container_positions:
-        
-        
-        # Step 1: Predict new allocated bandwidth (prediction1)
-        user_data_1 = user[input_columns_1].to_dict()
-        
-        #To TEST , remove while execution - THE BELOW THREE LINES
-        user_data_1['Required_Bandwidth'] *= 0.8
-        adjusted_signal_strength = user['Signal_Strength'] - abs(user['Updated_Signal_Strength'] - user['Signal_Strength'])
-        user_data_1['Updated_Signal_Strength'] = adjusted_signal_strength
-        
-        future1 = executor.submit(send_data_to_container, user_data_1, container_port, 'predict1')
-        prediction1 = future1.result()
-        new_allocated_bandwidth = prediction1.get('prediction', ['Error'])[0] if prediction1 else 'Error'
+    # Prepare input data for prediction
+    user_data_1 = user[input_columns_1].to_dict()
+    user_data_2 = user[input_columns_2].to_dict()
 
-        # Step 2: Boost the new allocated bandwidth by 10% based on QoS
-        new_allocated_bandwidth = enforce_qos(slice_type, new_allocated_bandwidth, user['Updated_Latency'])
+    # Send data to container and get predictions
+    future = executor.submit(
+        send_data_to_container,
+        user_data_1,
+        user_data_2,
+        slice_type,
+        user['Updated_Latency'],
+        user['Signal_Strength'],
+        user['Updated_Signal_Strength'],
+        container_port
+    )
 
-        # Step 3: Log the boosted bandwidth to the blockchain
-        # container_id = list(container_positions.keys()).index(container_port)
-        # log_to_blockchain(user_id, new_allocated_bandwidth, container_id)
+    result = future.result()
+    if result:
+        new_allocated_bandwidth = result.get('new_allocated_bandwidth', 'Error')
+        new_resource_allocation = result.get('new_resource_allocation', 'Error')
+    else:
+        new_allocated_bandwidth = 'Error'
+        new_resource_allocation = 'Error'
 
-        # Step 4: Prepare data for the second prediction (prediction2)
-        user_data_2 = user[input_columns_2].to_dict()
-        
-         
-        
-        user_data_2['Allocated_Bandwidth'] = new_allocated_bandwidth  # Include boosted bandwidth as a feature
+    # Ensure resource allocation is below 99
+    if new_resource_allocation != 'Error' and new_resource_allocation > 99:
+        new_resource_allocation = 99
 
-        # Step 5: Predict new resource allocation (prediction2)
-        future2 = executor.submit(send_data_to_container, user_data_2, container_port, 'predict2')
-        prediction2 = future2.result()
-        new_resource_allocation = prediction2.get('prediction', ['Error'])[0] if prediction2 else 'Error'
+    # Prepare data for CSV
+    result_data = {
+        'User_ID': int(user['User_ID']),
+        'Assigned_Edge_Node': container_port,
+        'Old_Resource_Allocation': user['Resource_Allocation'],
+        'New_Resource_Allocation': new_resource_allocation,
+        'Allocated_Bandwidth': user['Allocated_Bandwidth'],
+        'New_Allocated_Bandwidth': new_allocated_bandwidth
+    }
 
-        # Step 6: Ensure resource allocation is below 99
-        if new_resource_allocation != 'Error' and new_resource_allocation > 99:
-            new_resource_allocation = 99  # Cap the resource allocation at 99
+    # Save results to CSV
+    file_exists = os.path.exists(output_file)
+    pd.DataFrame([result_data]).to_csv(output_file, mode='a', header=not file_exists, index=False)
 
-        # Step 7: Save results to CSV
-        result_data = {
-            'User_ID': int(user['User_ID']),
-            'Assigned_Edge_Node': container_port,
-            'Old_Resource_Allocation': user['Resource_Allocation'],
-            'New_Resource_Allocation': new_resource_allocation,  # From prediction2 (capped at 99 if necessary)
-            'Allocated_Bandwidth': user['Allocated_Bandwidth'],
-            'New_Allocated_Bandwidth': new_allocated_bandwidth  # Boosted bandwidth logged to blockchain
-        }
-
-        file_exists = os.path.exists(output_file)
-        pd.DataFrame([result_data]).to_csv(output_file, mode='a', header=not file_exists, index=False)
-
-        progress_bar.update(1)  # Update progress bar
+    progress_bar.update(1)  # Update progress bar
 
 progress_bar.close()  # Close progress bar after completion
 
