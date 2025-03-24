@@ -2,10 +2,16 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
+
+# Set Times New Roman font for all text
+plt.rcParams['font.family'] = 'Times New Roman'
+plt.rcParams['font.size'] = 12  # Increased base font size
 
 # Define the output folder
 output_folder = "output/pre"
 graphs_folder = "graphs/results"
+os.makedirs(graphs_folder, exist_ok=True)
 
 # Function to calculate average values and rank algorithms
 def calculate_averages_and_rank(results_df):
@@ -52,12 +58,11 @@ def generate_comparison_graphs():
     # Create a plot for each parameter
     for parameter in parameters:
         print(f"\nGenerating plot for {parameter}...")
-        plt.figure(figsize=(14, 8))  # Increase figure size
-        sns.set(style="whitegrid")
-
+        plt.figure(figsize=(10, 6))  # Match previous figure size
+        
         # Define colors, line styles, and markers
         colors = sns.color_palette("husl", n_colors=len(algorithms))
-        line_styles = ['-', '--', '-.', ':', '-', '--', '-.']
+        line_styles = ['--', '--', '--', '--', '--', '--', '--']
         markers = ['o', 's', 'D', '^', 'v', '<', '>']
 
         # Plot a line for each algorithm
@@ -65,34 +70,40 @@ def generate_comparison_graphs():
             # Filter results for the current algorithm
             algorithm_results = results_df[results_df['Algorithm'] == algorithm]
             
-            # Plot the line with distinct style and transparency
+            # Plot the line with distinct style
             plt.plot(
                 algorithm_results['Cluster_Count'],
                 algorithm_results[parameter],
                 label=algorithm.capitalize(),
                 color=colors[i],
-                linestyle=line_styles[i],  # Distinct line style
-                marker=markers[i],        # Distinct marker
-                markersize=8,
-                linewidth=2.5,
-                alpha=0.8  # Add transparency
+                linestyle=line_styles[i],
+                marker=markers[i],
+                markersize=6,
+                linewidth=2,
+                alpha=0.8
             )
         
-        # Add labels, title, and legend
-        plt.xlabel('Cluster Count', fontsize=14)
-        plt.ylabel(parameter.replace('_', ' ').title(), fontsize=14)
-        plt.title(f'{parameter.replace("_", " ").title()} vs Cluster Count', fontsize=16)
-        plt.legend(title='Algorithm', bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=12)  # Move legend outside
-
-        # Add grid for better readability
+        # Add labels, title with consistent styling
+        plt.xlabel('Cluster Count', fontsize=18)
+        plt.ylabel(parameter.replace('_', ' ').title(), fontsize=18)
+        plt.title(f'{parameter.replace("_", " ").title()} vs Cluster Count', 
+                 fontsize=21, pad=20, fontweight="bold")
+        
+        # Set grid
+        plt.xticks(np.arange(2, 21, 2))
         plt.grid(True)
         
-        # Adjust layout to prevent overlap
-        plt.tight_layout()
+        # Adjust legend position - 4 items per row below the plot
+        plt.legend(bbox_to_anchor=(0.46, -0.15), loc='upper center', 
+                  ncol=4, fontsize=18)
         
-        # Save the plot in the common graphs folder
+        # Adjust layout to make room for the legend
+        plt.tight_layout()
+        plt.subplots_adjust(bottom=0.25)
+        
+        # Save the plot with high DPI
         plot_path = os.path.join(graphs_folder, f'{parameter}_vs_cluster_count.png')
-        plt.savefig(plot_path, bbox_inches='tight')
+        plt.savefig(plot_path, bbox_inches='tight', dpi=400)
         plt.close()
         print(f"Plot saved to {plot_path}.")
 
