@@ -25,8 +25,8 @@ total_rows = len(df)
 progress_bar = tqdm(total=total_rows, desc="Processing Users", unit="user")
 
 # Define columns for input
-input_columns_1 = ['Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth']
-input_columns_2 = ['Application_Type', 'Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth', 'Allocated_Bandwidth']
+input_columns_1 = ['Application_Type', 'Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth']
+input_columns_2 = ['Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth', 'Allocated_Bandwidth']
 
 executor = ThreadPoolExecutor(max_workers=5)
 

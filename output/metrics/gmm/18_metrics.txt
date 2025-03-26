@@ -1,9 +1,9 @@
 Metrics from edge_1:
 # HELP python_gc_objects_collected_total Objects collected during gc
 # TYPE python_gc_objects_collected_total counter
-python_gc_objects_collected_total{generation="0"} 2.933766e+06
-python_gc_objects_collected_total{generation="1"} 266903.0
-python_gc_objects_collected_total{generation="2"} 1306.0
+python_gc_objects_collected_total{generation="0"} 3.361486e+06
+python_gc_objects_collected_total{generation="1"} 305727.0
+python_gc_objects_collected_total{generation="2"} 2514.0
 # HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
 # TYPE python_gc_objects_uncollectable_total counter
 python_gc_objects_uncollectable_total{generation="0"} 0.0
@@ -11,24 +11,24 @@ python_gc_objects_uncollectable_total{generation="1"} 0.0
 python_gc_objects_uncollectable_total{generation="2"} 0.0
 # HELP python_gc_collections_total Number of times this generation was collected
 # TYPE python_gc_collections_total counter
-python_gc_collections_total{generation="0"} 4573.0
-python_gc_collections_total{generation="1"} 415.0
-python_gc_collections_total{generation="2"} 4.0
+python_gc_collections_total{generation="0"} 5764.0
+python_gc_collections_total{generation="1"} 523.0
+python_gc_collections_total{generation="2"} 6.0
 # HELP python_info Python platform information
 # TYPE python_info gauge
 python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
 # HELP process_virtual_memory_bytes Virtual memory size in bytes.
 # TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 3.06806784e+09
+process_virtual_memory_bytes 3.001020416e+09
 # HELP process_resident_memory_bytes Resident memory size in bytes.
 # TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.82566912e+08
+process_resident_memory_bytes 1.88215296e+08
 # HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
 # TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.74275227655e+09
+process_start_time_seconds 1.74292747369e+09
 # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
 # TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 1684.0500000000002
+process_cpu_seconds_total 2927.31
 # HELP process_open_fds Number of open file descriptors.
 # TYPE process_open_fds gauge
 process_open_fds 7.0
@@ -37,28 +37,28 @@ process_open_fds 7.0
 process_max_fds 1.048576e+06
 # HELP request_latency_seconds Time taken to process a request
 # TYPE request_latency_seconds summary
-request_latency_seconds_count 266738.0
-request_latency_seconds_sum 830.9940731525421
+request_latency_seconds_count 229318.0
+request_latency_seconds_sum 1874.2979454994202
 # HELP request_latency_seconds_created Time taken to process a request
 # TYPE request_latency_seconds_created gauge
-request_latency_seconds_created 1.7427522911729321e+09
+request_latency_seconds_created 1.7429274866385682e+09
 # HELP request_response_time_seconds Response time for each request
 # TYPE request_response_time_seconds gauge
-request_response_time_seconds 0.0025548934936523438
+request_response_time_seconds 0.006695747375488281
 # HELP request_throughput_total Total number of requests processed
 # TYPE request_throughput_total counter
-request_throughput_total 266738.0
+request_throughput_total 229318.0
 # HELP request_throughput_created Total number of requests processed
 # TYPE request_throughput_created gauge
-request_throughput_created 1.7427522911730232e+09
+request_throughput_created 1.7429274866387162e+09
 
 
 Metrics from edge_2:
 # HELP python_gc_objects_collected_total Objects collected during gc
 # TYPE python_gc_objects_collected_total counter
-python_gc_objects_collected_total{generation="0"} 2.078325e+06
-python_gc_objects_collected_total{generation="1"} 188955.0
-python_gc_objects_collected_total{generation="2"} 1306.0
+python_gc_objects_collected_total{generation="0"} 2.575175e+06
+python_gc_objects_collected_total{generation="1"} 235019.0
+python_gc_objects_collected_total{generation="2"} 1886.0
 # HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
 # TYPE python_gc_objects_uncollectable_total counter
 python_gc_objects_uncollectable_total{generation="0"} 0.0
@@ -66,24 +66,79 @@ python_gc_objects_uncollectable_total{generation="1"} 0.0
 python_gc_objects_uncollectable_total{generation="2"} 0.0
 # HELP python_gc_collections_total Number of times this generation was collected
 # TYPE python_gc_collections_total counter
-python_gc_collections_total{generation="0"} 3343.0
-python_gc_collections_total{generation="1"} 303.0
+python_gc_collections_total{generation="0"} 4490.0
+python_gc_collections_total{generation="1"} 408.0
+python_gc_collections_total{generation="2"} 5.0
+# HELP python_info Python platform information
+# TYPE python_info gauge
+python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 3.001024512e+09
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 1.87899904e+08
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.74292747365e+09
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 2122.49
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 7.0
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1.048576e+06
+# HELP request_latency_seconds Time taken to process a request
+# TYPE request_latency_seconds summary
+request_latency_seconds_count 175698.0
+request_latency_seconds_sum 1238.2454206943512
+# HELP request_latency_seconds_created Time taken to process a request
+# TYPE request_latency_seconds_created gauge
+request_latency_seconds_created 1.742927486787503e+09
+# HELP request_response_time_seconds Response time for each request
+# TYPE request_response_time_seconds gauge
+request_response_time_seconds 0.007466793060302734
+# HELP request_throughput_total Total number of requests processed
+# TYPE request_throughput_total counter
+request_throughput_total 175698.0
+# HELP request_throughput_created Total number of requests processed
+# TYPE request_throughput_created gauge
+request_throughput_created 1.7429274867876186e+09
+
+
+Metrics from edge_3:
+# HELP python_gc_objects_collected_total Objects collected during gc
+# TYPE python_gc_objects_collected_total counter
+python_gc_objects_collected_total{generation="0"} 1.161562e+06
+python_gc_objects_collected_total{generation="1"} 105931.0
+python_gc_objects_collected_total{generation="2"} 1258.0
+# HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
+# TYPE python_gc_objects_uncollectable_total counter
+python_gc_objects_uncollectable_total{generation="0"} 0.0
+python_gc_objects_uncollectable_total{generation="1"} 0.0
+python_gc_objects_uncollectable_total{generation="2"} 0.0
+# HELP python_gc_collections_total Number of times this generation was collected
+# TYPE python_gc_collections_total counter
+python_gc_collections_total{generation="0"} 2220.0
+python_gc_collections_total{generation="1"} 201.0
 python_gc_collections_total{generation="2"} 4.0
 # HELP python_info Python platform information
 # TYPE python_info gauge
 python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
 # HELP process_virtual_memory_bytes Virtual memory size in bytes.
 # TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 3.068059648e+09
+process_virtual_memory_bytes 3.00101632e+09
 # HELP process_resident_memory_bytes Resident memory size in bytes.
 # TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.82775808e+08
+process_resident_memory_bytes 1.890304e+08
 # HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
 # TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.74275227655e+09
+process_start_time_seconds 1.74292747762e+09
 # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
 # TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 1210.6399999999999
+process_cpu_seconds_total 963.89
 # HELP process_open_fds Number of open file descriptors.
 # TYPE process_open_fds gauge
 process_open_fds 7.0
@@ -92,83 +147,28 @@ process_open_fds 7.0
 process_max_fds 1.048576e+06
 # HELP request_latency_seconds Time taken to process a request
 # TYPE request_latency_seconds summary
-request_latency_seconds_count 188994.0
-request_latency_seconds_sum 560.0398807525635
+request_latency_seconds_count 79233.0
+request_latency_seconds_sum 553.8194515705109
 # HELP request_latency_seconds_created Time taken to process a request
 # TYPE request_latency_seconds_created gauge
-request_latency_seconds_created 1.7427522910900054e+09
+request_latency_seconds_created 1.7429274883868322e+09
 # HELP request_response_time_seconds Response time for each request
 # TYPE request_response_time_seconds gauge
-request_response_time_seconds 0.0025565624237060547
+request_response_time_seconds 0.007934093475341797
 # HELP request_throughput_total Total number of requests processed
 # TYPE request_throughput_total counter
-request_throughput_total 188994.0
+request_throughput_total 79233.0
 # HELP request_throughput_created Total number of requests processed
 # TYPE request_throughput_created gauge
-request_throughput_created 1.742752291090088e+09
-
-
-Metrics from edge_3:
-# HELP python_gc_objects_collected_total Objects collected during gc
-# TYPE python_gc_objects_collected_total counter
-python_gc_objects_collected_total{generation="0"} 1.218265e+06
-python_gc_objects_collected_total{generation="1"} 111195.0
-python_gc_objects_collected_total{generation="2"} 610.0
-# HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
-# TYPE python_gc_objects_uncollectable_total counter
-python_gc_objects_uncollectable_total{generation="0"} 0.0
-python_gc_objects_uncollectable_total{generation="1"} 0.0
-python_gc_objects_uncollectable_total{generation="2"} 0.0
-# HELP python_gc_collections_total Number of times this generation was collected
-# TYPE python_gc_collections_total counter
-python_gc_collections_total{generation="0"} 2104.0
-python_gc_collections_total{generation="1"} 191.0
-python_gc_collections_total{generation="2"} 3.0
-# HELP python_info Python platform information
-# TYPE python_info gauge
-python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
-# HELP process_virtual_memory_bytes Virtual memory size in bytes.
-# TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 3.000963072e+09
-# HELP process_resident_memory_bytes Resident memory size in bytes.
-# TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.87695104e+08
-# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
-# TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.74275227664e+09
-# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
-# TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 711.44
-# HELP process_open_fds Number of open file descriptors.
-# TYPE process_open_fds gauge
-process_open_fds 7.0
-# HELP process_max_fds Maximum number of open file descriptors.
-# TYPE process_max_fds gauge
-process_max_fds 1.048576e+06
-# HELP request_latency_seconds Time taken to process a request
-# TYPE request_latency_seconds summary
-request_latency_seconds_count 110774.0
-request_latency_seconds_sum 319.00160336494446
-# HELP request_latency_seconds_created Time taken to process a request
-# TYPE request_latency_seconds_created gauge
-request_latency_seconds_created 1.7427522906995409e+09
-# HELP request_response_time_seconds Response time for each request
-# TYPE request_response_time_seconds gauge
-request_response_time_seconds 0.0025353431701660156
-# HELP request_throughput_total Total number of requests processed
-# TYPE request_throughput_total counter
-request_throughput_total 110774.0
-# HELP request_throughput_created Total number of requests processed
-# TYPE request_throughput_created gauge
-request_throughput_created 1.7427522906996183e+09
+request_throughput_created 1.7429274883870184e+09
 
 
 Metrics from edge_4:
 # HELP python_gc_objects_collected_total Objects collected during gc
 # TYPE python_gc_objects_collected_total counter
-python_gc_objects_collected_total{generation="0"} 1.169613e+06
-python_gc_objects_collected_total{generation="1"} 106327.0
-python_gc_objects_collected_total{generation="2"} 610.0
+python_gc_objects_collected_total{generation="0"} 1.476542e+06
+python_gc_objects_collected_total{generation="1"} 134659.0
+python_gc_objects_collected_total{generation="2"} 1258.0
 # HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
 # TYPE python_gc_objects_uncollectable_total counter
 python_gc_objects_uncollectable_total{generation="0"} 0.0
@@ -176,24 +176,24 @@ python_gc_objects_uncollectable_total{generation="1"} 0.0
 python_gc_objects_uncollectable_total{generation="2"} 0.0
 # HELP python_gc_collections_total Number of times this generation was collected
 # TYPE python_gc_collections_total counter
-python_gc_collections_total{generation="0"} 2034.0
-python_gc_collections_total{generation="1"} 184.0
-python_gc_collections_total{generation="2"} 3.0
+python_gc_collections_total{generation="0"} 2725.0
+python_gc_collections_total{generation="1"} 247.0
+python_gc_collections_total{generation="2"} 4.0
 # HELP python_info Python platform information
 # TYPE python_info gauge
 python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
 # HELP process_virtual_memory_bytes Virtual memory size in bytes.
 # TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 3.000950784e+09
+process_virtual_memory_bytes 3.002064896e+09
 # HELP process_resident_memory_bytes Resident memory size in bytes.
 # TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.88776448e+08
+process_resident_memory_bytes 1.8731008e+08
 # HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
 # TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.74275227601e+09
+process_start_time_seconds 1.74292747376e+09
 # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
 # TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 675.36
+process_cpu_seconds_total 1231.04
 # HELP process_open_fds Number of open file descriptors.
 # TYPE process_open_fds gauge
 process_open_fds 7.0
@@ -202,28 +202,28 @@ process_open_fds 7.0
 process_max_fds 1.048576e+06
 # HELP request_latency_seconds Time taken to process a request
 # TYPE request_latency_seconds summary
-request_latency_seconds_count 106294.0
-request_latency_seconds_sum 300.81672048568726
+request_latency_seconds_count 100712.0
+request_latency_seconds_sum 705.4514808654785
 # HELP request_latency_seconds_created Time taken to process a request
 # TYPE request_latency_seconds_created gauge
-request_latency_seconds_created 1.7427522909065912e+09
+request_latency_seconds_created 1.742927487017709e+09
 # HELP request_response_time_seconds Response time for each request
 # TYPE request_response_time_seconds gauge
-request_response_time_seconds 0.003003835678100586
+request_response_time_seconds 0.006363868713378906
 # HELP request_throughput_total Total number of requests processed
 # TYPE request_throughput_total counter
-request_throughput_total 106294.0
+request_throughput_total 100712.0
 # HELP request_throughput_created Total number of requests processed
 # TYPE request_throughput_created gauge
-request_throughput_created 1.7427522909066803e+09
+request_throughput_created 1.7429274870181243e+09
 
 
 Metrics from edge_5:
 # HELP python_gc_objects_collected_total Objects collected during gc
 # TYPE python_gc_objects_collected_total counter
-python_gc_objects_collected_total{generation="0"} 1.103473e+06
-python_gc_objects_collected_total{generation="1"} 100755.0
-python_gc_objects_collected_total{generation="2"} 610.0
+python_gc_objects_collected_total{generation="0"} 774018.0
+python_gc_objects_collected_total{generation="1"} 71011.0
+python_gc_objects_collected_total{generation="2"} 634.0
 # HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
 # TYPE python_gc_objects_uncollectable_total counter
 python_gc_objects_uncollectable_total{generation="0"} 0.0
@@ -231,24 +231,24 @@ python_gc_objects_uncollectable_total{generation="1"} 0.0
 python_gc_objects_uncollectable_total{generation="2"} 0.0
 # HELP python_gc_collections_total Number of times this generation was collected
 # TYPE python_gc_collections_total counter
-python_gc_collections_total{generation="0"} 1939.0
-python_gc_collections_total{generation="1"} 176.0
+python_gc_collections_total{generation="0"} 1596.0
+python_gc_collections_total{generation="1"} 145.0
 python_gc_collections_total{generation="2"} 3.0
 # HELP python_info Python platform information
 # TYPE python_info gauge
 python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
 # HELP process_virtual_memory_bytes Virtual memory size in bytes.
 # TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 3.000958976e+09
+process_virtual_memory_bytes 3.001012224e+09
 # HELP process_resident_memory_bytes Resident memory size in bytes.
 # TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.88829696e+08
+process_resident_memory_bytes 1.8894848e+08
 # HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
 # TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.74275227703e+09
+process_start_time_seconds 1.74292747395e+09
 # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
 # TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 637.45
+process_cpu_seconds_total 688.7
 # HELP process_open_fds Number of open file descriptors.
 # TYPE process_open_fds gauge
 process_open_fds 7.0
@@ -257,28 +257,28 @@ process_open_fds 7.0
 process_max_fds 1.048576e+06
 # HELP request_latency_seconds Time taken to process a request
 # TYPE request_latency_seconds summary
-request_latency_seconds_count 100330.0
-request_latency_seconds_sum 294.61108469963074
+request_latency_seconds_count 52791.0
+request_latency_seconds_sum 394.02615690231323
 # HELP request_latency_seconds_created Time taken to process a request
 # TYPE request_latency_seconds_created gauge
-request_latency_seconds_created 1.7427522909702952e+09
+request_latency_seconds_created 1.7429274867972229e+09
 # HELP request_response_time_seconds Response time for each request
 # TYPE request_response_time_seconds gauge
-request_response_time_seconds 0.002507448196411133
+request_response_time_seconds 0.0068590641021728516
 # HELP request_throughput_total Total number of requests processed
 # TYPE request_throughput_total counter
-request_throughput_total 100330.0
+request_throughput_total 52791.0
 # HELP request_throughput_created Total number of requests processed
 # TYPE request_throughput_created gauge
-request_throughput_created 1.742752291181061e+09
+request_throughput_created 1.742927486797326e+09
 
 
 Metrics from edge_6:
 # HELP python_gc_objects_collected_total Objects collected during gc
 # TYPE python_gc_objects_collected_total counter
-python_gc_objects_collected_total{generation="0"} 1.009529e+06
-python_gc_objects_collected_total{generation="1"} 91667.0
-python_gc_objects_collected_total{generation="2"} 610.0
+python_gc_objects_collected_total{generation="0"} 1.162819e+06
+python_gc_objects_collected_total{generation="1"} 105955.0
+python_gc_objects_collected_total{generation="2"} 1258.0
 # HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
 # TYPE python_gc_objects_uncollectable_total counter
 python_gc_objects_uncollectable_total{generation="0"} 0.0
@@ -286,24 +286,24 @@ python_gc_objects_uncollectable_total{generation="1"} 0.0
 python_gc_objects_uncollectable_total{generation="2"} 0.0
 # HELP python_gc_collections_total Number of times this generation was collected
 # TYPE python_gc_collections_total counter
-python_gc_collections_total{generation="0"} 1804.0
-python_gc_collections_total{generation="1"} 163.0
-python_gc_collections_total{generation="2"} 3.0
+python_gc_collections_total{generation="0"} 2222.0
+python_gc_collections_total{generation="1"} 201.0
+python_gc_collections_total{generation="2"} 4.0
 # HELP python_info Python platform information
 # TYPE python_info gauge
 python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
 # HELP process_virtual_memory_bytes Virtual memory size in bytes.
 # TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 3.000967168e+09
+process_virtual_memory_bytes 3.00101632e+09
 # HELP process_resident_memory_bytes Resident memory size in bytes.
 # TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.87322368e+08
+process_resident_memory_bytes 1.87502592e+08
 # HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
 # TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.74275227703e+09
+process_start_time_seconds 1.74292747665e+09
 # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
 # TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 559.03
+process_cpu_seconds_total 969.01
 # HELP process_open_fds Number of open file descriptors.
 # TYPE process_open_fds gauge
 process_open_fds 7.0
@@ -312,28 +312,28 @@ process_open_fds 7.0
 process_max_fds 1.048576e+06
 # HELP request_latency_seconds Time taken to process a request
 # TYPE request_latency_seconds summary
-request_latency_seconds_count 91720.0
-request_latency_seconds_sum 245.93281769752502
+request_latency_seconds_count 79340.0
+request_latency_seconds_sum 552.2863085269928
 # HELP request_latency_seconds_created Time taken to process a request
 # TYPE request_latency_seconds_created gauge
-request_latency_seconds_created 1.7427522909703937e+09
+request_latency_seconds_created 1.742927488686638e+09
 # HELP request_response_time_seconds Response time for each request
 # TYPE request_response_time_seconds gauge
-request_response_time_seconds 0.0041577816009521484
+request_response_time_seconds 0.00700831413269043
 # HELP request_throughput_total Total number of requests processed
 # TYPE request_throughput_total counter
-request_throughput_total 91720.0
+request_throughput_total 79340.0
 # HELP request_throughput_created Total number of requests processed
 # TYPE request_throughput_created gauge
-request_throughput_created 1.7427522909704885e+09
+request_throughput_created 1.7429274886868742e+09
 
 
 Metrics from edge_7:
 # HELP python_gc_objects_collected_total Objects collected during gc
 # TYPE python_gc_objects_collected_total counter
-python_gc_objects_collected_total{generation="0"} 479073.0
-python_gc_objects_collected_total{generation="1"} 43651.0
-python_gc_objects_collected_total{generation="2"} 610.0
+python_gc_objects_collected_total{generation="0"} 425630.0
+python_gc_objects_collected_total{generation="1"} 39207.0
+python_gc_objects_collected_total{generation="2"} 634.0
 # HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
 # TYPE python_gc_objects_uncollectable_total counter
 python_gc_objects_uncollectable_total{generation="0"} 0.0
@@ -341,7 +341,7 @@ python_gc_objects_uncollectable_total{generation="1"} 0.0
 python_gc_objects_uncollectable_total{generation="2"} 0.0
 # HELP python_gc_collections_total Number of times this generation was collected
 # TYPE python_gc_collections_total counter
-python_gc_collections_total{generation="0"} 1042.0
+python_gc_collections_total{generation="0"} 1037.0
 python_gc_collections_total{generation="1"} 94.0
 python_gc_collections_total{generation="2"} 3.0
 # HELP python_info Python platform information
@@ -349,16 +349,16 @@ python_gc_collections_total{generation="2"} 3.0
 python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
 # HELP process_virtual_memory_bytes Virtual memory size in bytes.
 # TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 3.000958976e+09
+process_virtual_memory_bytes 3.001008128e+09
 # HELP process_resident_memory_bytes Resident memory size in bytes.
 # TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.88604416e+08
+process_resident_memory_bytes 1.88485632e+08
 # HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
 # TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.74275227597e+09
+process_start_time_seconds 1.74292747803e+09
 # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
 # TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 282.03999999999996
+process_cpu_seconds_total 368.66
 # HELP process_open_fds Number of open file descriptors.
 # TYPE process_open_fds gauge
 process_open_fds 7.0
@@ -367,28 +367,28 @@ process_open_fds 7.0
 process_max_fds 1.048576e+06
 # HELP request_latency_seconds Time taken to process a request
 # TYPE request_latency_seconds summary
-request_latency_seconds_count 43566.0
-request_latency_seconds_sum 123.29790139198303
+request_latency_seconds_count 29049.0
+request_latency_seconds_sum 205.67868781089783
 # HELP request_latency_seconds_created Time taken to process a request
 # TYPE request_latency_seconds_created gauge
-request_latency_seconds_created 1.7427522907703235e+09
+request_latency_seconds_created 1.7429274884955723e+09
 # HELP request_response_time_seconds Response time for each request
 # TYPE request_response_time_seconds gauge
-request_response_time_seconds 0.002961397171020508
+request_response_time_seconds 0.006644725799560547
 # HELP request_throughput_total Total number of requests processed
 # TYPE request_throughput_total counter
-request_throughput_total 43566.0
+request_throughput_total 29049.0
 # HELP request_throughput_created Total number of requests processed
 # TYPE request_throughput_created gauge
-request_throughput_created 1.7427522907705047e+09
+request_throughput_created 1.7429274884956715e+09
 
 
 Metrics from edge_8:
 # HELP python_gc_objects_collected_total Objects collected during gc
 # TYPE python_gc_objects_collected_total counter
-python_gc_objects_collected_total{generation="0"} 948029.0
-python_gc_objects_collected_total{generation="1"} 85991.0
-python_gc_objects_collected_total{generation="2"} 610.0
+python_gc_objects_collected_total{generation="0"} 1.188046e+06
+python_gc_objects_collected_total{generation="1"} 108711.0
+python_gc_objects_collected_total{generation="2"} 1258.0
 # HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
 # TYPE python_gc_objects_uncollectable_total counter
 python_gc_objects_uncollectable_total{generation="0"} 0.0
@@ -396,24 +396,24 @@ python_gc_objects_uncollectable_total{generation="1"} 0.0
 python_gc_objects_uncollectable_total{generation="2"} 0.0
 # HELP python_gc_collections_total Number of times this generation was collected
 # TYPE python_gc_collections_total counter
-python_gc_collections_total{generation="0"} 1716.0
-python_gc_collections_total{generation="1"} 155.0
-python_gc_collections_total{generation="2"} 3.0
+python_gc_collections_total{generation="0"} 2267.0
+python_gc_collections_total{generation="1"} 206.0
+python_gc_collections_total{generation="2"} 4.0
 # HELP python_info Python platform information
 # TYPE python_info gauge
 python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
 # HELP process_virtual_memory_bytes Virtual memory size in bytes.
 # TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 3.000963072e+09
+process_virtual_memory_bytes 3.001024512e+09
 # HELP process_resident_memory_bytes Resident memory size in bytes.
 # TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.94707456e+08
+process_resident_memory_bytes 1.87674624e+08
 # HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
 # TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.74275227574e+09
+process_start_time_seconds 1.7429274737e+09
 # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
 # TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 531.3199999999999
+process_cpu_seconds_total 1022.99
 # HELP process_open_fds Number of open file descriptors.
 # TYPE process_open_fds gauge
 process_open_fds 7.0
@@ -422,28 +422,28 @@ process_open_fds 7.0
 process_max_fds 1.048576e+06
 # HELP request_latency_seconds Time taken to process a request
 # TYPE request_latency_seconds summary
-request_latency_seconds_count 86152.0
-request_latency_seconds_sum 267.2449424266815
+request_latency_seconds_count 81058.0
+request_latency_seconds_sum 652.0634000301361
 # HELP request_latency_seconds_created Time taken to process a request
 # TYPE request_latency_seconds_created gauge
-request_latency_seconds_created 1.7427522905801127e+09
+request_latency_seconds_created 1.742927485195514e+09
 # HELP request_response_time_seconds Response time for each request
 # TYPE request_response_time_seconds gauge
-request_response_time_seconds 0.0029697418212890625
+request_response_time_seconds 0.006900787353515625
 # HELP request_throughput_total Total number of requests processed
 # TYPE request_throughput_total counter
-request_throughput_total 86152.0
+request_throughput_total 81058.0
 # HELP request_throughput_created Total number of requests processed
 # TYPE request_throughput_created gauge
-request_throughput_created 1.7427522905802135e+09
+request_throughput_created 1.7429274851956208e+09
 
 
 Metrics from edge_9:
 # HELP python_gc_objects_collected_total Objects collected during gc
 # TYPE python_gc_objects_collected_total counter
-python_gc_objects_collected_total{generation="0"} 239781.0
-python_gc_objects_collected_total{generation="1"} 22159.0
-python_gc_objects_collected_total{generation="2"} 610.0
+python_gc_objects_collected_total{generation="0"} 261559.0
+python_gc_objects_collected_total{generation="1"} 24207.0
+python_gc_objects_collected_total{generation="2"} 634.0
 # HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
 # TYPE python_gc_objects_uncollectable_total counter
 python_gc_objects_uncollectable_total{generation="0"} 0.0
@@ -451,24 +451,24 @@ python_gc_objects_uncollectable_total{generation="1"} 0.0
 python_gc_objects_uncollectable_total{generation="2"} 0.0
 # HELP python_gc_collections_total Number of times this generation was collected
 # TYPE python_gc_collections_total counter
-python_gc_collections_total{generation="0"} 698.0
-python_gc_collections_total{generation="1"} 63.0
+python_gc_collections_total{generation="0"} 774.0
+python_gc_collections_total{generation="1"} 70.0
 python_gc_collections_total{generation="2"} 3.0
 # HELP python_info Python platform information
 # TYPE python_info gauge
 python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
 # HELP process_virtual_memory_bytes Virtual memory size in bytes.
 # TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 3.000942592e+09
+process_virtual_memory_bytes 3.00101632e+09
 # HELP process_resident_memory_bytes Resident memory size in bytes.
 # TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.88809216e+08
+process_resident_memory_bytes 1.93159168e+08
 # HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
 # TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.74275227547e+09
+process_start_time_seconds 1.74292747424e+09
 # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
 # TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 150.1
+process_cpu_seconds_total 234.99
 # HELP process_open_fds Number of open file descriptors.
 # TYPE process_open_fds gauge
 process_open_fds 7.0
@@ -477,28 +477,28 @@ process_open_fds 7.0
 process_max_fds 1.048576e+06
 # HELP request_latency_seconds Time taken to process a request
 # TYPE request_latency_seconds summary
-request_latency_seconds_count 21830.0
-request_latency_seconds_sum 64.10111141204834
+request_latency_seconds_count 17852.0
+request_latency_seconds_sum 127.65774703025818
 # HELP request_latency_seconds_created Time taken to process a request
 # TYPE request_latency_seconds_created gauge
-request_latency_seconds_created 1.742752289500641e+09
+request_latency_seconds_created 1.7429274876028392e+09
 # HELP request_response_time_seconds Response time for each request
 # TYPE request_response_time_seconds gauge
-request_response_time_seconds 0.0034661293029785156
+request_response_time_seconds 0.007935762405395508
 # HELP request_throughput_total Total number of requests processed
 # TYPE request_throughput_total counter
-request_throughput_total 21830.0
+request_throughput_total 17852.0
 # HELP request_throughput_created Total number of requests processed
 # TYPE request_throughput_created gauge
-request_throughput_created 1.7427522895007496e+09
+request_throughput_created 1.7429274876029503e+09
 
 
 Metrics from edge_10:
 # HELP python_gc_objects_collected_total Objects collected during gc
 # TYPE python_gc_objects_collected_total counter
-python_gc_objects_collected_total{generation="0"} 306722.0
-python_gc_objects_collected_total{generation="1"} 28347.0
-python_gc_objects_collected_total{generation="2"} 610.0
+python_gc_objects_collected_total{generation="0"} 357819.0
+python_gc_objects_collected_total{generation="1"} 32939.0
+python_gc_objects_collected_total{generation="2"} 634.0
 # HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
 # TYPE python_gc_objects_uncollectable_total counter
 python_gc_objects_uncollectable_total{generation="0"} 0.0
@@ -506,24 +506,24 @@ python_gc_objects_uncollectable_total{generation="1"} 0.0
 python_gc_objects_uncollectable_total{generation="2"} 0.0
 # HELP python_gc_collections_total Number of times this generation was collected
 # TYPE python_gc_collections_total counter
-python_gc_collections_total{generation="0"} 794.0
-python_gc_collections_total{generation="1"} 72.0
+python_gc_collections_total{generation="0"} 929.0
+python_gc_collections_total{generation="1"} 84.0
 python_gc_collections_total{generation="2"} 3.0
 # HELP python_info Python platform information
 # TYPE python_info gauge
 python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
 # HELP process_virtual_memory_bytes Virtual memory size in bytes.
 # TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 3.00095488e+09
+process_virtual_memory_bytes 3.001012224e+09
 # HELP process_resident_memory_bytes Resident memory size in bytes.
 # TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.87236352e+08
+process_resident_memory_bytes 1.87723776e+08
 # HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
 # TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.74275227575e+09
+process_start_time_seconds 1.74292747544e+09
 # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
 # TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 177.06
+process_cpu_seconds_total 316.1
 # HELP process_open_fds Number of open file descriptors.
 # TYPE process_open_fds gauge
 process_open_fds 7.0
@@ -532,28 +532,28 @@ process_open_fds 7.0
 process_max_fds 1.048576e+06
 # HELP request_latency_seconds Time taken to process a request
 # TYPE request_latency_seconds summary
-request_latency_seconds_count 27886.0
-request_latency_seconds_sum 75.5745301246643
+request_latency_seconds_count 24406.0
+request_latency_seconds_sum 192.61111879348755
 # HELP request_latency_seconds_created Time taken to process a request
 # TYPE request_latency_seconds_created gauge
-request_latency_seconds_created 1.7427522907900946e+09
+request_latency_seconds_created 1.742927488327111e+09
 # HELP request_response_time_seconds Response time for each request
 # TYPE request_response_time_seconds gauge
-request_response_time_seconds 0.0023953914642333984
+request_response_time_seconds 0.006528615951538086
 # HELP request_throughput_total Total number of requests processed
 # TYPE request_throughput_total counter
-request_throughput_total 27886.0
+request_throughput_total 24406.0
 # HELP request_throughput_created Total number of requests processed
 # TYPE request_throughput_created gauge
-request_throughput_created 1.7427522907901819e+09
+request_throughput_created 1.7429274883272386e+09
 
 
 Metrics from edge_11:
 # HELP python_gc_objects_collected_total Objects collected during gc
 # TYPE python_gc_objects_collected_total counter
-python_gc_objects_collected_total{generation="0"} 541577.0
-python_gc_objects_collected_total{generation="1"} 49259.0
-python_gc_objects_collected_total{generation="2"} 610.0
+python_gc_objects_collected_total{generation="0"} 572086.0
+python_gc_objects_collected_total{generation="1"} 52335.0
+python_gc_objects_collected_total{generation="2"} 634.0
 # HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
 # TYPE python_gc_objects_uncollectable_total counter
 python_gc_objects_uncollectable_total{generation="0"} 0.0
@@ -561,24 +561,24 @@ python_gc_objects_uncollectable_total{generation="1"} 0.0
 python_gc_objects_uncollectable_total{generation="2"} 0.0
 # HELP python_gc_collections_total Number of times this generation was collected
 # TYPE python_gc_collections_total counter
-python_gc_collections_total{generation="0"} 1132.0
-python_gc_collections_total{generation="1"} 102.0
+python_gc_collections_total{generation="0"} 1274.0
+python_gc_collections_total{generation="1"} 115.0
 python_gc_collections_total{generation="2"} 3.0
 # HELP python_info Python platform information
 # TYPE python_info gauge
 python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
 # HELP process_virtual_memory_bytes Virtual memory size in bytes.
 # TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 3.06806784e+09
+process_virtual_memory_bytes 3.001012224e+09
 # HELP process_resident_memory_bytes Resident memory size in bytes.
 # TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.89882368e+08
+process_resident_memory_bytes 1.88755968e+08
 # HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
 # TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.74275227587e+09
+process_start_time_seconds 1.7429274739e+09
 # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
 # TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 309.68
+process_cpu_seconds_total 516.3299999999999
 # HELP process_open_fds Number of open file descriptors.
 # TYPE process_open_fds gauge
 process_open_fds 7.0
@@ -587,28 +587,28 @@ process_open_fds 7.0
 process_max_fds 1.048576e+06
 # HELP request_latency_seconds Time taken to process a request
 # TYPE request_latency_seconds summary
-request_latency_seconds_count 49222.0
-request_latency_seconds_sum 176.32630276679993
+request_latency_seconds_count 39003.0
+request_latency_seconds_sum 336.6660304069519
 # HELP request_latency_seconds_created Time taken to process a request
 # TYPE request_latency_seconds_created gauge
-request_latency_seconds_created 1.7427522898950748e+09
+request_latency_seconds_created 1.7429274870291173e+09
 # HELP request_response_time_seconds Response time for each request
 # TYPE request_response_time_seconds gauge
-request_response_time_seconds 0.003339052200317383
+request_response_time_seconds 0.0067064762115478516
 # HELP request_throughput_total Total number of requests processed
 # TYPE request_throughput_total counter
-request_throughput_total 49222.0
+request_throughput_total 39003.0
 # HELP request_throughput_created Total number of requests processed
 # TYPE request_throughput_created gauge
-request_throughput_created 1.7427522898951645e+09
+request_throughput_created 1.7429274870292077e+09
 
 
 Metrics from edge_12:
 # HELP python_gc_objects_collected_total Objects collected during gc
 # TYPE python_gc_objects_collected_total counter
-python_gc_objects_collected_total{generation="0"} 348446.0
-python_gc_objects_collected_total{generation="1"} 31839.0
-python_gc_objects_collected_total{generation="2"} 610.0
+python_gc_objects_collected_total{generation="0"} 305246.0
+python_gc_objects_collected_total{generation="1"} 27975.0
+python_gc_objects_collected_total{generation="2"} 634.0
 # HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
 # TYPE python_gc_objects_uncollectable_total counter
 python_gc_objects_uncollectable_total{generation="0"} 0.0
@@ -616,24 +616,24 @@ python_gc_objects_uncollectable_total{generation="1"} 0.0
 python_gc_objects_uncollectable_total{generation="2"} 0.0
 # HELP python_gc_collections_total Number of times this generation was collected
 # TYPE python_gc_collections_total counter
-python_gc_collections_total{generation="0"} 854.0
-python_gc_collections_total{generation="1"} 77.0
+python_gc_collections_total{generation="0"} 844.0
+python_gc_collections_total{generation="1"} 76.0
 python_gc_collections_total{generation="2"} 3.0
 # HELP python_info Python platform information
 # TYPE python_info gauge
 python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
 # HELP process_virtual_memory_bytes Virtual memory size in bytes.
 # TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 3.000946688e+09
+process_virtual_memory_bytes 3.001024512e+09
 # HELP process_resident_memory_bytes Resident memory size in bytes.
 # TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.86015744e+08
+process_resident_memory_bytes 1.89161472e+08
 # HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
 # TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.74275227548e+09
+process_start_time_seconds 1.74292747389e+09
 # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
 # TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 204.39
+process_cpu_seconds_total 267.29
 # HELP process_open_fds Number of open file descriptors.
 # TYPE process_open_fds gauge
 process_open_fds 7.0
@@ -642,28 +642,28 @@ process_open_fds 7.0
 process_max_fds 1.048576e+06
 # HELP request_latency_seconds Time taken to process a request
 # TYPE request_latency_seconds summary
-request_latency_seconds_count 31656.0
-request_latency_seconds_sum 87.96024298667908
+request_latency_seconds_count 20799.0
+request_latency_seconds_sum 146.65854263305664
 # HELP request_latency_seconds_created Time taken to process a request
 # TYPE request_latency_seconds_created gauge
-request_latency_seconds_created 1.742752289677176e+09
+request_latency_seconds_created 1.7429274875016916e+09
 # HELP request_response_time_seconds Response time for each request
 # TYPE request_response_time_seconds gauge
-request_response_time_seconds 0.0028350353240966797
+request_response_time_seconds 0.007676601409912109
 # HELP request_throughput_total Total number of requests processed
 # TYPE request_throughput_total counter
-request_throughput_total 31656.0
+request_throughput_total 20799.0
 # HELP request_throughput_created Total number of requests processed
 # TYPE request_throughput_created gauge
-request_throughput_created 1.742752289677294e+09
+request_throughput_created 1.7429274875018046e+09
 
 
 Metrics from edge_13:
 # HELP python_gc_objects_collected_total Objects collected during gc
 # TYPE python_gc_objects_collected_total counter
-python_gc_objects_collected_total{generation="0"} 203657.0
-python_gc_objects_collected_total{generation="1"} 18635.0
-python_gc_objects_collected_total{generation="2"} 610.0
+python_gc_objects_collected_total{generation="0"} 188610.0
+python_gc_objects_collected_total{generation="1"} 17379.0
+python_gc_objects_collected_total{generation="2"} 634.0
 # HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
 # TYPE python_gc_objects_uncollectable_total counter
 python_gc_objects_uncollectable_total{generation="0"} 0.0
@@ -671,24 +671,24 @@ python_gc_objects_uncollectable_total{generation="1"} 0.0
 python_gc_objects_uncollectable_total{generation="2"} 0.0
 # HELP python_gc_collections_total Number of times this generation was collected
 # TYPE python_gc_collections_total counter
-python_gc_collections_total{generation="0"} 646.0
-python_gc_collections_total{generation="1"} 58.0
+python_gc_collections_total{generation="0"} 657.0
+python_gc_collections_total{generation="1"} 59.0
 python_gc_collections_total{generation="2"} 3.0
 # HELP python_info Python platform information
 # TYPE python_info gauge
 python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
 # HELP process_virtual_memory_bytes Virtual memory size in bytes.
 # TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 3.000958976e+09
+process_virtual_memory_bytes 3.001012224e+09
 # HELP process_resident_memory_bytes Resident memory size in bytes.
 # TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.86568704e+08
+process_resident_memory_bytes 1.90881792e+08
 # HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
 # TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.74275227616e+09
+process_start_time_seconds 1.74292747435e+09
 # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
 # TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 117.97999999999999
+process_cpu_seconds_total 173.13
 # HELP process_open_fds Number of open file descriptors.
 # TYPE process_open_fds gauge
 process_open_fds 7.0
@@ -697,28 +697,28 @@ process_open_fds 7.0
 process_max_fds 1.048576e+06
 # HELP request_latency_seconds Time taken to process a request
 # TYPE request_latency_seconds summary
-request_latency_seconds_count 18516.0
-request_latency_seconds_sum 48.801624059677124
+request_latency_seconds_count 12850.0
+request_latency_seconds_sum 92.6071949005127
 # HELP request_latency_seconds_created Time taken to process a request
 # TYPE request_latency_seconds_created gauge
-request_latency_seconds_created 1.7427522907848284e+09
+request_latency_seconds_created 1.7429274877950866e+09
 # HELP request_response_time_seconds Response time for each request
 # TYPE request_response_time_seconds gauge
-request_response_time_seconds 0.002491474151611328
+request_response_time_seconds 0.008233308792114258
 # HELP request_throughput_total Total number of requests processed
 # TYPE request_throughput_total counter
-request_throughput_total 18516.0
+request_throughput_total 12850.0
 # HELP request_throughput_created Total number of requests processed
 # TYPE request_throughput_created gauge
-request_throughput_created 1.742752290784916e+09
+request_throughput_created 1.7429274877951787e+09
 
 
 Metrics from edge_14:
 # HELP python_gc_objects_collected_total Objects collected during gc
 # TYPE python_gc_objects_collected_total counter
-python_gc_objects_collected_total{generation="0"} 167429.0
-python_gc_objects_collected_total{generation="1"} 15143.0
-python_gc_objects_collected_total{generation="2"} 610.0
+python_gc_objects_collected_total{generation="0"} 230978.0
+python_gc_objects_collected_total{generation="1"} 21123.0
+python_gc_objects_collected_total{generation="2"} 634.0
 # HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
 # TYPE python_gc_objects_uncollectable_total counter
 python_gc_objects_uncollectable_total{generation="0"} 0.0
@@ -726,117 +726,7 @@ python_gc_objects_uncollectable_total{generation="1"} 0.0
 python_gc_objects_uncollectable_total{generation="2"} 0.0
 # HELP python_gc_collections_total Number of times this generation was collected
 # TYPE python_gc_collections_total counter
-python_gc_collections_total{generation="0"} 594.0
-python_gc_collections_total{generation="1"} 53.0
-python_gc_collections_total{generation="2"} 3.0
-# HELP python_info Python platform information
-# TYPE python_info gauge
-python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
-# HELP process_virtual_memory_bytes Virtual memory size in bytes.
-# TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 3.000963072e+09
-# HELP process_resident_memory_bytes Resident memory size in bytes.
-# TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.8538496e+08
-# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
-# TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.74275227557e+09
-# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
-# TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 102.33
-# HELP process_open_fds Number of open file descriptors.
-# TYPE process_open_fds gauge
-process_open_fds 7.0
-# HELP process_max_fds Maximum number of open file descriptors.
-# TYPE process_max_fds gauge
-process_max_fds 1.048576e+06
-# HELP request_latency_seconds Time taken to process a request
-# TYPE request_latency_seconds summary
-request_latency_seconds_count 15196.0
-request_latency_seconds_sum 41.976489543914795
-# HELP request_latency_seconds_created Time taken to process a request
-# TYPE request_latency_seconds_created gauge
-request_latency_seconds_created 1.7427522892925231e+09
-# HELP request_response_time_seconds Response time for each request
-# TYPE request_response_time_seconds gauge
-request_response_time_seconds 0.0028722286224365234
-# HELP request_throughput_total Total number of requests processed
-# TYPE request_throughput_total counter
-request_throughput_total 15196.0
-# HELP request_throughput_created Total number of requests processed
-# TYPE request_throughput_created gauge
-request_throughput_created 1.7427522892926252e+09
-
-
-Metrics from edge_15:
-# HELP python_gc_objects_collected_total Objects collected during gc
-# TYPE python_gc_objects_collected_total counter
-python_gc_objects_collected_total{generation="0"} 318554.0
-python_gc_objects_collected_total{generation="1"} 29067.0
-python_gc_objects_collected_total{generation="2"} 610.0
-# HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
-# TYPE python_gc_objects_uncollectable_total counter
-python_gc_objects_uncollectable_total{generation="0"} 0.0
-python_gc_objects_uncollectable_total{generation="1"} 0.0
-python_gc_objects_uncollectable_total{generation="2"} 0.0
-# HELP python_gc_collections_total Number of times this generation was collected
-# TYPE python_gc_collections_total counter
-python_gc_collections_total{generation="0"} 811.0
-python_gc_collections_total{generation="1"} 73.0
-python_gc_collections_total{generation="2"} 3.0
-# HELP python_info Python platform information
-# TYPE python_info gauge
-python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
-# HELP process_virtual_memory_bytes Virtual memory size in bytes.
-# TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 3.00095488e+09
-# HELP process_resident_memory_bytes Resident memory size in bytes.
-# TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.89272064e+08
-# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
-# TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.74275227561e+09
-# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
-# TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 188.65
-# HELP process_open_fds Number of open file descriptors.
-# TYPE process_open_fds gauge
-process_open_fds 7.0
-# HELP process_max_fds Maximum number of open file descriptors.
-# TYPE process_max_fds gauge
-process_max_fds 1.048576e+06
-# HELP request_latency_seconds Time taken to process a request
-# TYPE request_latency_seconds summary
-request_latency_seconds_count 28950.0
-request_latency_seconds_sum 80.64480018615723
-# HELP request_latency_seconds_created Time taken to process a request
-# TYPE request_latency_seconds_created gauge
-request_latency_seconds_created 1.742752289500632e+09
-# HELP request_response_time_seconds Response time for each request
-# TYPE request_response_time_seconds gauge
-request_response_time_seconds 0.0024988651275634766
-# HELP request_throughput_total Total number of requests processed
-# TYPE request_throughput_total counter
-request_throughput_total 28950.0
-# HELP request_throughput_created Total number of requests processed
-# TYPE request_throughput_created gauge
-request_throughput_created 1.7427522895007303e+09
-
-
-Metrics from edge_16:
-# HELP python_gc_objects_collected_total Objects collected during gc
-# TYPE python_gc_objects_collected_total counter
-python_gc_objects_collected_total{generation="0"} 257990.0
-python_gc_objects_collected_total{generation="1"} 23487.0
-python_gc_objects_collected_total{generation="2"} 610.0
-# HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
-# TYPE python_gc_objects_uncollectable_total counter
-python_gc_objects_uncollectable_total{generation="0"} 0.0
-python_gc_objects_uncollectable_total{generation="1"} 0.0
-python_gc_objects_uncollectable_total{generation="2"} 0.0
-# HELP python_gc_collections_total Number of times this generation was collected
-# TYPE python_gc_collections_total counter
-python_gc_collections_total{generation="0"} 724.0
+python_gc_collections_total{generation="0"} 725.0
 python_gc_collections_total{generation="1"} 65.0
 python_gc_collections_total{generation="2"} 3.0
 # HELP python_info Python platform information
@@ -844,16 +734,16 @@ python_gc_collections_total{generation="2"} 3.0
 python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
 # HELP process_virtual_memory_bytes Virtual memory size in bytes.
 # TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 3.000946688e+09
+process_virtual_memory_bytes 3.00101632e+09
 # HELP process_resident_memory_bytes Resident memory size in bytes.
 # TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.84582144e+08
+process_resident_memory_bytes 1.87527168e+08
 # HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
 # TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.74275227544e+09
+process_start_time_seconds 1.74292747544e+09
 # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
 # TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 157.16
+process_cpu_seconds_total 208.8
 # HELP process_open_fds Number of open file descriptors.
 # TYPE process_open_fds gauge
 process_open_fds 7.0
@@ -862,28 +752,138 @@ process_open_fds 7.0
 process_max_fds 1.048576e+06
 # HELP request_latency_seconds Time taken to process a request
 # TYPE request_latency_seconds summary
-request_latency_seconds_count 23446.0
-request_latency_seconds_sum 66.78579664230347
+request_latency_seconds_count 15738.0
+request_latency_seconds_sum 113.00768971443176
 # HELP request_latency_seconds_created Time taken to process a request
 # TYPE request_latency_seconds_created gauge
-request_latency_seconds_created 1.7427522889994416e+09
+request_latency_seconds_created 1.7429274881061969e+09
 # HELP request_response_time_seconds Response time for each request
 # TYPE request_response_time_seconds gauge
-request_response_time_seconds 0.002869129180908203
+request_response_time_seconds 0.006769895553588867
 # HELP request_throughput_total Total number of requests processed
 # TYPE request_throughput_total counter
-request_throughput_total 23446.0
+request_throughput_total 15738.0
 # HELP request_throughput_created Total number of requests processed
 # TYPE request_throughput_created gauge
-request_throughput_created 1.7427522889995356e+09
+request_throughput_created 1.742927488106308e+09
+
+
+Metrics from edge_15:
+# HELP python_gc_objects_collected_total Objects collected during gc
+# TYPE python_gc_objects_collected_total counter
+python_gc_objects_collected_total{generation="0"} 371334.0
+python_gc_objects_collected_total{generation="1"} 34223.0
+python_gc_objects_collected_total{generation="2"} 634.0
+# HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
+# TYPE python_gc_objects_uncollectable_total counter
+python_gc_objects_uncollectable_total{generation="0"} 0.0
+python_gc_objects_uncollectable_total{generation="1"} 0.0
+python_gc_objects_uncollectable_total{generation="2"} 0.0
+# HELP python_gc_collections_total Number of times this generation was collected
+# TYPE python_gc_collections_total counter
+python_gc_collections_total{generation="0"} 950.0
+python_gc_collections_total{generation="1"} 86.0
+python_gc_collections_total{generation="2"} 3.0
+# HELP python_info Python platform information
+# TYPE python_info gauge
+python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 3.001024512e+09
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 1.86159104e+08
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.74292747544e+09
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 330.12
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 7.0
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1.048576e+06
+# HELP request_latency_seconds Time taken to process a request
+# TYPE request_latency_seconds summary
+request_latency_seconds_count 25327.0
+request_latency_seconds_sum 183.2316586971283
+# HELP request_latency_seconds_created Time taken to process a request
+# TYPE request_latency_seconds_created gauge
+request_latency_seconds_created 1.7429274877821887e+09
+# HELP request_response_time_seconds Response time for each request
+# TYPE request_response_time_seconds gauge
+request_response_time_seconds 0.006841182708740234
+# HELP request_throughput_total Total number of requests processed
+# TYPE request_throughput_total counter
+request_throughput_total 25327.0
+# HELP request_throughput_created Total number of requests processed
+# TYPE request_throughput_created gauge
+request_throughput_created 1.7429274877823322e+09
+
+
+Metrics from edge_16:
+# HELP python_gc_objects_collected_total Objects collected during gc
+# TYPE python_gc_objects_collected_total counter
+python_gc_objects_collected_total{generation="0"} 330826.0
+python_gc_objects_collected_total{generation="1"} 30423.0
+python_gc_objects_collected_total{generation="2"} 634.0
+# HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
+# TYPE python_gc_objects_uncollectable_total counter
+python_gc_objects_uncollectable_total{generation="0"} 0.0
+python_gc_objects_uncollectable_total{generation="1"} 0.0
+python_gc_objects_uncollectable_total{generation="2"} 0.0
+# HELP python_gc_collections_total Number of times this generation was collected
+# TYPE python_gc_collections_total counter
+python_gc_collections_total{generation="0"} 885.0
+python_gc_collections_total{generation="1"} 80.0
+python_gc_collections_total{generation="2"} 3.0
+# HELP python_info Python platform information
+# TYPE python_info gauge
+python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 3.00099584e+09
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 1.87715584e+08
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.74292747491e+09
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 294.16
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 7.0
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1.048576e+06
+# HELP request_latency_seconds Time taken to process a request
+# TYPE request_latency_seconds summary
+request_latency_seconds_count 22578.0
+request_latency_seconds_sum 162.34886646270752
+# HELP request_latency_seconds_created Time taken to process a request
+# TYPE request_latency_seconds_created gauge
+request_latency_seconds_created 1.7429274877063992e+09
+# HELP request_response_time_seconds Response time for each request
+# TYPE request_response_time_seconds gauge
+request_response_time_seconds 0.006338834762573242
+# HELP request_throughput_total Total number of requests processed
+# TYPE request_throughput_total counter
+request_throughput_total 22578.0
+# HELP request_throughput_created Total number of requests processed
+# TYPE request_throughput_created gauge
+request_throughput_created 1.74292748770653e+09
 
 
 Metrics from edge_17:
 # HELP python_gc_objects_collected_total Objects collected during gc
 # TYPE python_gc_objects_collected_total counter
-python_gc_objects_collected_total{generation="0"} 62258.0
-python_gc_objects_collected_total{generation="1"} 6099.0
-python_gc_objects_collected_total{generation="2"} 610.0
+python_gc_objects_collected_total{generation="0"} 68242.0
+python_gc_objects_collected_total{generation="1"} 6771.0
+python_gc_objects_collected_total{generation="2"} 634.0
 # HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
 # TYPE python_gc_objects_uncollectable_total counter
 python_gc_objects_uncollectable_total{generation="0"} 0.0
@@ -891,24 +891,24 @@ python_gc_objects_uncollectable_total{generation="1"} 0.0
 python_gc_objects_uncollectable_total{generation="2"} 0.0
 # HELP python_gc_collections_total Number of times this generation was collected
 # TYPE python_gc_collections_total counter
-python_gc_collections_total{generation="0"} 443.0
-python_gc_collections_total{generation="1"} 40.0
+python_gc_collections_total{generation="0"} 464.0
+python_gc_collections_total{generation="1"} 42.0
 python_gc_collections_total{generation="2"} 3.0
 # HELP python_info Python platform information
 # TYPE python_info gauge
 python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
 # HELP process_virtual_memory_bytes Virtual memory size in bytes.
 # TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 2.93384192e+09
+process_virtual_memory_bytes 2.933911552e+09
 # HELP process_resident_memory_bytes Resident memory size in bytes.
 # TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.82521856e+08
+process_resident_memory_bytes 1.85761792e+08
 # HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
 # TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.74275228046e+09
+process_start_time_seconds 1.74292747459e+09
 # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
 # TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 45.8
+process_cpu_seconds_total 74.96
 # HELP process_open_fds Number of open file descriptors.
 # TYPE process_open_fds gauge
 process_open_fds 7.0
@@ -917,28 +917,28 @@ process_open_fds 7.0
 process_max_fds 1.048576e+06
 # HELP request_latency_seconds Time taken to process a request
 # TYPE request_latency_seconds summary
-request_latency_seconds_count 5662.0
-request_latency_seconds_sum 16.828969478607178
+request_latency_seconds_count 4679.0
+request_latency_seconds_sum 35.71044635772705
 # HELP request_latency_seconds_created Time taken to process a request
 # TYPE request_latency_seconds_created gauge
-request_latency_seconds_created 1.7427522911818364e+09
+request_latency_seconds_created 1.7429274877953265e+09
 # HELP request_response_time_seconds Response time for each request
 # TYPE request_response_time_seconds gauge
-request_response_time_seconds 0.0025908946990966797
+request_response_time_seconds 0.0069959163665771484
 # HELP request_throughput_total Total number of requests processed
 # TYPE request_throughput_total counter
-request_throughput_total 5662.0
+request_throughput_total 4679.0
 # HELP request_throughput_created Total number of requests processed
 # TYPE request_throughput_created gauge
-request_throughput_created 1.742752291181903e+09
+request_throughput_created 1.7429274877954354e+09
 
 
 Metrics from edge_18:
 # HELP python_gc_objects_collected_total Objects collected during gc
 # TYPE python_gc_objects_collected_total counter
-python_gc_objects_collected_total{generation="0"} 100025.0
-python_gc_objects_collected_total{generation="1"} 9587.0
-python_gc_objects_collected_total{generation="2"} 610.0
+python_gc_objects_collected_total{generation="0"} 107502.0
+python_gc_objects_collected_total{generation="1"} 9895.0
+python_gc_objects_collected_total{generation="2"} 634.0
 # HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
 # TYPE python_gc_objects_uncollectable_total counter
 python_gc_objects_uncollectable_total{generation="0"} 0.0
@@ -946,24 +946,24 @@ python_gc_objects_uncollectable_total{generation="1"} 0.0
 python_gc_objects_uncollectable_total{generation="2"} 0.0
 # HELP python_gc_collections_total Number of times this generation was collected
 # TYPE python_gc_collections_total counter
-python_gc_collections_total{generation="0"} 497.0
-python_gc_collections_total{generation="1"} 45.0
+python_gc_collections_total{generation="0"} 527.0
+python_gc_collections_total{generation="1"} 47.0
 python_gc_collections_total{generation="2"} 3.0
 # HELP python_info Python platform information
 # TYPE python_info gauge
 python_info{implementation="CPython",major="3",minor="10",patchlevel="16",version="3.10.16"} 1.0
 # HELP process_virtual_memory_bytes Virtual memory size in bytes.
 # TYPE process_virtual_memory_bytes gauge
-process_virtual_memory_bytes 2.93384192e+09
+process_virtual_memory_bytes 3.002073088e+09
 # HELP process_resident_memory_bytes Resident memory size in bytes.
 # TYPE process_resident_memory_bytes gauge
-process_resident_memory_bytes 1.88473344e+08
+process_resident_memory_bytes 1.87879424e+08
 # HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
 # TYPE process_start_time_seconds gauge
-process_start_time_seconds 1.74275227799e+09
+process_start_time_seconds 1.74292747381e+09
 # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
 # TYPE process_cpu_seconds_total counter
-process_cpu_seconds_total 66.94
+process_cpu_seconds_total 105.68
 # HELP process_open_fds Number of open file descriptors.
 # TYPE process_open_fds gauge
 process_open_fds 7.0
@@ -972,19 +972,19 @@ process_open_fds 7.0
 process_max_fds 1.048576e+06
 # HELP request_latency_seconds Time taken to process a request
 # TYPE request_latency_seconds summary
-request_latency_seconds_count 9136.0
-request_latency_seconds_sum 26.31718897819519
+request_latency_seconds_count 7341.0
+request_latency_seconds_sum 53.57856464385986
 # HELP request_latency_seconds_created Time taken to process a request
 # TYPE request_latency_seconds_created gauge
-request_latency_seconds_created 1.7427522912788053e+09
+request_latency_seconds_created 1.7429274873961756e+09
 # HELP request_response_time_seconds Response time for each request
 # TYPE request_response_time_seconds gauge
-request_response_time_seconds 0.0028748512268066406
+request_response_time_seconds 0.0075778961181640625
 # HELP request_throughput_total Total number of requests processed
 # TYPE request_throughput_total counter
-request_throughput_total 9136.0
+request_throughput_total 7341.0
 # HELP request_throughput_created Total number of requests processed
 # TYPE request_throughput_created gauge
-request_throughput_created 1.7427522912788708e+09
+request_throughput_created 1.742927487396305e+09
 
 

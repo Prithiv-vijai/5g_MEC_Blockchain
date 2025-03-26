@@ -6,15 +6,23 @@ import numpy as np
 
 # Set Times New Roman font for all text
 plt.rcParams['font.family'] = 'Times New Roman'
-plt.rcParams['font.size'] = 12  # Increased base font size
+plt.rcParams['font.size'] = 14  # Increased base font size
 
-# Create output directory if it doesn't exist
+# Create output directories if they don't exist
 os.makedirs("graphs/results/metrics", exist_ok=True)
+os.makedirs("output/post", exist_ok=True)  # Directory for CSV output
 
 # Define the directory structure
 base_dir = "output"
 docker_metrics_dir = os.path.join(base_dir, "docker_metrics")
-algorithms = ["dbscan", "divisive", "gmm", "hierarchical", "kmeans", "meanshift", "optics"]
+algorithms = ["kmeans", "meanshift", "optics"]
+
+# Define specific colors and markers for each algorithm
+algorithm_styles = {
+    'kmeans': {'color': '#1f77b4', 'marker': 'o'},
+    'optics': {'color': '#d62728', 'marker': '^'},
+    'meanshift': {'color': '#9467bd', 'marker': 'v'},
+}
 
 def parse_docker_metrics_file(file_path):
     """Parse a docker metrics file and extract values for each edge"""
@@ -97,96 +105,58 @@ for algorithm in algorithms:
 # Convert to DataFrame
 df = pd.DataFrame(all_data)
 
+# Save consolidated metrics to CSV
+csv_path = os.path.join("output", "post", "docker_consolidated_metrics.csv")
+df.to_csv(csv_path, index=False)
+print(f"\nSaved consolidated metrics to {csv_path}\n")
+
+def plot_metrics(df, metric, ylabel, title, filename):
+    """Plot metrics (CPU or Memory usage) with specific algorithm styles"""
+    if metric in df.columns:
+        plt.figure(figsize=(10, 7))
+        
+        for algorithm in algorithms:
+            algorithm_data = df[df['algorithm'] == algorithm]
+            if not algorithm_data.empty:
+                algorithm_data = algorithm_data.sort_values('edge_count')
+                style = algorithm_styles.get(algorithm, {'color': '#000000', 'marker': 'o'})
+                plt.plot(algorithm_data['edge_count'], algorithm_data[metric], 
+                        label=algorithm.capitalize(),
+                        color=style['color'],
+                        marker=style['marker'],
+                        linestyle='--',
+                        markersize=6,
+                        linewidth=2,
+                        alpha=0.8)
+        
+        # Set x-ticks to show even numbers from 2 to 20
+        plt.xticks(np.arange(2, 21, 2))
+        
+        plt.xlabel('Number of Edges', fontsize=18)
+        plt.ylabel(ylabel, fontsize=20)
+        plt.title(title, fontsize=21, pad=20, fontweight="bold")
+        
+        # Adjust legend position - 4 items per row below the plot
+        plt.legend(bbox_to_anchor=(0.46, -0.15), loc='upper center', 
+                  ncol=4, fontsize=20)
+        
+        plt.grid(True)
+        
+        # Adjust layout to make room for the legend
+        plt.tight_layout()
+        plt.subplots_adjust(bottom=0.25)
+        
+        plot_filename = os.path.join("graphs", "results", "metrics", filename)
+        plt.savefig(plot_filename, bbox_inches='tight', dpi=300)
+        plt.close()
+        print(f"Saved {metric} plot to {plot_filename}")
+    else:
+        print(f"No {metric} data found in the metrics files")
+
 # Plot CPU Usage
-if 'cpu_usage' in df.columns:
-    plt.figure(figsize=(10, 6))
-    
-    # Define colors, line styles, and markers
-    colors = plt.cm.tab10(np.linspace(0, 1, len(algorithms)))
-    line_styles = ['-', '--', '-.', ':', '-', '--', '-.']
-    markers = ['o', 's', 'D', '^', 'v', '<', '>']
-    
-    for i, algorithm in enumerate(algorithms):
-        algorithm_data = df[df['algorithm'] == algorithm]
-        if not algorithm_data.empty:
-            algorithm_data = algorithm_data.sort_values('edge_count')
-            plt.plot(algorithm_data['edge_count'], algorithm_data['cpu_usage'], 
-                    label=algorithm.capitalize(),
-                    color=colors[i],
-                    linestyle=line_styles[i],
-                    marker=markers[i],
-                    markersize=6,
-                    linewidth=2,
-                    alpha=0.8)
-    
-    # Set x-ticks to show even numbers from 2 to 20
-    plt.xticks(np.arange(2, 21, 2))
-    
-    plt.xlabel('Number of Edges', fontsize=18)
-    plt.ylabel('CPU Usage (%)', fontsize=18)
-    plt.title('Average CPU Usage vs Number of Edges', fontsize=21, pad=20, fontweight="bold")
-    
-    # Adjust legend position - 4 items per row below the plot
-    plt.legend(bbox_to_anchor=(0.46, -0.15), loc='upper center', 
-              ncol=4, fontsize=18)
-    
-    plt.grid(True)
-    
-    # Adjust layout to make room for the legend
-    plt.tight_layout()
-    plt.subplots_adjust(bottom=0.25)
-    
-    plot_filename = os.path.join("graphs", "results", "metrics", "cpu-usage.png")
-    plt.savefig(plot_filename, bbox_inches='tight', dpi=300)
-    plt.close()
-    print(f"Saved CPU usage plot to {plot_filename}")
-else:
-    print("No CPU usage data found in the metrics files")
+plot_metrics(df, 'cpu_usage', 'CPU Usage (%)', 'Average CPU Usage vs Number of Edges', 'cpu-usage.png')
 
 # Plot Memory Usage
-if 'memory_usage' in df.columns:
-    plt.figure(figsize=(10, 6))
-    
-    # Define colors, line styles, and markers (same as above)
-    colors = plt.cm.tab10(np.linspace(0, 1, len(algorithms)))
-    line_styles = ['--', '--', '--', '--', '--', '--', '--']
-    markers = ['o', 's', 'D', '^', 'v', '<', '>']
-    
-    for i, algorithm in enumerate(algorithms):
-        algorithm_data = df[df['algorithm'] == algorithm]
-        if not algorithm_data.empty:
-            algorithm_data = algorithm_data.sort_values('edge_count')
-            plt.plot(algorithm_data['edge_count'], algorithm_data['memory_usage'], 
-                    label=algorithm.capitalize(),
-                    color=colors[i],
-                    linestyle=line_styles[i],
-                    marker=markers[i],
-                    markersize=6,
-                    linewidth=2,
-                    alpha=0.8)
-    
-    # Set x-ticks to show even numbers from 2 to 20
-    plt.xticks(np.arange(2, 21, 2))
-    
-    plt.xlabel('Number of Edges', fontsize=18)
-    plt.ylabel('Memory Usage (MiB)', fontsize=18)
-    plt.title('Average Memory Usage vs Number of Edges', fontsize=21, pad=20, fontweight="bold")
-    
-    # Adjust legend position - 4 items per row below the plot
-    plt.legend(bbox_to_anchor=(0.46, -0.15), loc='upper center', 
-              ncol=4, fontsize=18)
-    
-    plt.grid(True)
-    
-    # Adjust layout to make room for the legend
-    plt.tight_layout()
-    plt.subplots_adjust(bottom=0.25)
-    
-    plot_filename = os.path.join("graphs", "results", "metrics", "memory-usage.png")
-    plt.savefig(plot_filename, bbox_inches='tight', dpi=300)
-    plt.close()
-    print(f"Saved memory usage plot to {plot_filename}")
-else:
-    print("No memory usage data found in the metrics files")
+plot_metrics(df, 'memory_usage', 'Memory Usage (MiB)', 'Average Memory Usage vs Number of Edges', 'memory-usage.png')
 
-print("Docker metrics processing complete!")
+print("\nDocker metrics processing complete!")

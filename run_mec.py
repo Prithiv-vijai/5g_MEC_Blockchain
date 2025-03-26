@@ -11,7 +11,7 @@ BASE_METRICS_DIR = "output/metrics"
 BASE_DOCKER_METRICS_DIR = "output/docker_metrics"
 
 # List of folders to process
-FOLDERS = ["kmeans", "hierarchical", "divisive", "gmm", "dbscan", "meanshift", "optics"]
+FOLDERS = ["meanshift", "optics", "kmeans"]
 
 # Ensure base output and metrics directories exist
 os.makedirs(BASE_OUTPUT_DIR, exist_ok=True)
@@ -22,6 +22,21 @@ def get_edge_count(input_file):
     """Extract the number of edges from the filename (e.g., 3_cluster.csv -> 3)."""
     base_name = os.path.basename(input_file)
     return int(re.sub(r"[^0-9]", "", base_name.split("_")[0]))
+
+def restart_docker_containers():
+    """Restart all Docker containers using docker-compose."""
+    print("Restarting Docker containers...")
+    try:
+        # First, stop all containers
+        subprocess.run(["docker-compose", "down"], check=True)
+        # Then start them fresh
+        subprocess.run(["docker-compose", "up", "-d"], check=True)
+        print("✅ Docker containers restarted successfully")
+        # Give containers some time to initialize
+        time.sleep(30)
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Failed to restart Docker containers: {e}")
+        raise
 
 def collect_docker_metrics(container_names, interval=1):
     """Collect Docker container metrics periodically."""
@@ -59,7 +74,7 @@ def reset_metrics(edge_count):
     """Reset metrics on all edge nodes."""
     print("Resetting metrics on edge nodes...")
     for i in range(1, edge_count + 1):
-        reset_url = f"http://localhost:{8000 + i}/reset"  # Correct URL formatting
+        reset_url = f"http://localhost:{8000 + i}/reset"
         try:
             subprocess.run(
                 ["curl", "-X", "POST", reset_url],
@@ -101,6 +116,9 @@ def process_folder(folder):
     # Loop through all cluster CSV files in the input directory
     for input_file in os.listdir(INPUT_DIR):
         if input_file.endswith("_cluster.csv"):
+            # Restart containers before processing each file
+            restart_docker_containers()
+            
             input_path = os.path.join(INPUT_DIR, input_file)
             
             # Extract the base name (e.g., 2_cluster.csv -> 2)
@@ -148,13 +166,13 @@ def process_folder(folder):
                 
                 # Wait for edge nodes to become ready
                 print("Waiting for edge nodes to become ready...")
-                time.sleep(10)  # Adjust delay as needed
+                time.sleep(120)  # Adjust delay as needed
                 
                 # Fetch metrics from all edge nodes and save to the metrics file
                 print(f"Collecting metrics for {input_path}...")
                 with open(metrics_file, "w") as f:
                     for i in range(1, edge_count + 1):
-                        metrics_url = f"http://localhost:{8000 + i}/metrics"  # Correct URL formatting
+                        metrics_url = f"http://localhost:{8000 + i}/metrics"
                         print(f"Fetching metrics from {metrics_url}...")
                         metrics_data = fetch_metrics_with_retry(metrics_url)
                         if metrics_data:

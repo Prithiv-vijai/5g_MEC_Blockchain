@@ -3,135 +3,257 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import warnings
+from typing import Dict, List
 
 warnings.filterwarnings('ignore')
 
 # Define directories
-pre_data_folder = "output/pre/dbscan"
-post_data_folder = "output/post/dbscan"
-output_folder = "graphs/results"
+pre_data_folder = "output/pre/kmeans"
+post_data_folder = "output/post/kmeans"
+out_folder = "output/post/"
+output_folder = "graphs/results/decentralization"
 os.makedirs(output_folder, exist_ok=True)
+os.makedirs(post_data_folder, exist_ok=True)
 
-# Mapping words to numbers for filenames with word-based edge counts
-word_to_num = {
-    'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
-    'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10,
-    'eleven': 11, 'twelve': 12, 'thirteen': 13, 'fourteen': 14,
-    'fifteen': 15, 'sixteen': 16, 'seventeen': 17, 'eighteen': 18,
-    'nineteen': 19, 'twenty': 20
-}
+# ==============================================
+# PART 1: DATA CALCULATION AND CONSOLIDATED CSV
+# ==============================================
 
-# Fetch pre and post edge files dynamically
-pre_edge_files = {}
-post_edge_files = {}
+def calculate_and_save_metrics() -> pd.DataFrame:
+    """Calculate all metrics and save to a consolidated CSV file."""
+    # Mapping for word to number conversion
+    word_to_num = {
+        'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
+        'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10,
+        'eleven': 11, 'twelve': 12, 'thirteen': 13, 'fourteen': 14,
+        'fifteen': 15, 'sixteen': 16, 'seventeen': 17, 'eighteen': 18,
+        'nineteen': 19, 'twenty': 20
+    }
 
-def extract_edge_count(file_name):
-    edge_part = file_name.split('_')[0].lower()
-    return int(edge_part) if edge_part.isdigit() else word_to_num.get(edge_part)
+    def extract_edge_count(file_name: str) -> int:
+        """Extract edge count from filename."""
+        edge_part = file_name.split('_')[0].lower()
+        return int(edge_part) if edge_part.isdigit() else word_to_num.get(edge_part)
 
-for file in os.listdir(pre_data_folder):
-    if file.endswith('.csv'):
-        edge_count = extract_edge_count(file)
-        if edge_count:
-            pre_edge_files[str(edge_count)] = file  
+    # Load all data files
+    pre_files = {str(extract_edge_count(f)): f for f in os.listdir(pre_data_folder) 
+                if f.endswith('.csv') and extract_edge_count(f)}
+    post_files = {str(extract_edge_count(f)): f for f in os.listdir(post_data_folder) 
+                 if f.endswith('.csv') and extract_edge_count(f)}
 
-for file in os.listdir(post_data_folder):
-    if file.endswith('.csv'):
-        edge_count = extract_edge_count(file)
-        if edge_count:
-            post_edge_files[str(edge_count)] = file
+    # Initialize consolidated metrics dataframe
+    metrics = pd.DataFrame(columns=[
+        'Cluster_Count', 'Latency', 'Signal_Strength', 'Distance',
+        'Resource_Allocation', 'Allocated_Bandwidth'
+    ])
 
-# Load '10' Edge values from the three_cluster dataset
-df_old = pd.read_csv(os.path.join(pre_data_folder, '10_cluster.csv')).dropna()
-avg_latency = {'1': df_old['Latency'].mean()}
-avg_signal_strength = {'1': df_old['Signal_Strength'].mean()}
-avg_distance = {'1': df_old['Distance_meters'].mean()}
+    # Process baseline data (10 clusters)
+    baseline_df = pd.read_csv(os.path.join(pre_data_folder, '10_cluster.csv')).dropna()
+    metrics.loc[0] = {
+        'Cluster_Count': 1,
+        'Latency': baseline_df['Latency'].mean(),
+        'Signal_Strength': baseline_df['Signal_Strength'].mean(),
+        'Distance': baseline_df['Distance_meters'].mean(),
+        'Resource_Allocation': None,  # Will be filled from post data
+        'Allocated_Bandwidth': None   # Will be filled from post data
+    }
 
-# Read data for new configurations and compute updated averages
-for label, file in pre_edge_files.items():
-    df = pd.read_csv(os.path.join(pre_data_folder, file)).dropna()
-    avg_latency[label] = df['Updated_Latency'].mean()
-    avg_signal_strength[label] = df['Updated_Signal_Strength'].mean()
-    avg_distance[label] = df['New_Distance'].mean()
+    # Process pre files (updated metrics)
+    for edge_count, file in pre_files.items():
+        df = pd.read_csv(os.path.join(pre_data_folder, file)).dropna()
+        metrics.loc[len(metrics)] = {
+            'Cluster_Count': int(edge_count),
+            'Latency': df['Updated_Latency'].mean(),
+            'Signal_Strength': df['Updated_Signal_Strength'].mean(),
+            'Distance': df['New_Distance'].mean(),
+            'Resource_Allocation': None,
+            'Allocated_Bandwidth': None
+        }
 
-# Convert to pandas Series for plotting
-avg_latency = pd.Series(avg_latency).sort_index(key=lambda x: x.astype(int))
-avg_signal_strength = pd.Series(avg_signal_strength).sort_index(key=lambda x: x.astype(int))
-avg_distance = pd.Series(avg_distance).sort_index(key=lambda x: x.astype(int))
+    # Process post files (resource allocation and bandwidth)
+    for edge_count, file in post_files.items():
+        df = pd.read_csv(os.path.join(post_data_folder, file)).dropna()
+        
+        # Update corresponding row in metrics
+        idx = metrics[metrics['Cluster_Count'] == int(edge_count)].index
+        if not idx.empty:
+            metrics.loc[idx, 'Resource_Allocation'] = df['New_Resource_Allocation'].mean()
+            metrics.loc[idx, 'Allocated_Bandwidth'] = df['New_Allocated_Bandwidth'].sum()
+        else:
+            # If no pre data exists, create new row
+            metrics.loc[len(metrics)] = {
+                'Cluster_Count': int(edge_count),
+                'Latency': None,
+                'Signal_Strength': None,
+                'Distance': None,
+                'Resource_Allocation': df['New_Resource_Allocation'].mean(),
+                'Allocated_Bandwidth': df['New_Allocated_Bandwidth'].sum()
+            }
 
-# Load datasets for post-processing analysis
-data = {edge_count: pd.read_csv(os.path.join(post_data_folder, file)) for edge_count, file in post_edge_files.items()}
-edge_counts = sorted(data.keys(), key=int)
+    # Fill baseline resource allocation and bandwidth from 10_cluster post data
+    if '10' in post_files:
+        post_10 = pd.read_csv(os.path.join(post_data_folder, post_files['10'])).dropna()
+        metrics.loc[metrics['Cluster_Count'] == 1, 'Resource_Allocation'] = post_10['Old_Resource_Allocation'].mean()
+        metrics.loc[metrics['Cluster_Count'] == 1, 'Allocated_Bandwidth'] = post_10['Allocated_Bandwidth'].sum()
 
-# Compute statistics for resource allocation analysis
-avg_old_res_alloc = data["10"]["Old_Resource_Allocation"].mean() 
-avg_new_res_alloc = [data[edge]["New_Resource_Allocation"].mean() for edge in edge_counts]
-boost_percentage = [(val - avg_old_res_alloc) / avg_old_res_alloc * 100 for val in avg_new_res_alloc]
+    # Sort by cluster count and save
+    metrics = metrics.sort_values('Cluster_Count').reset_index(drop=True)
 
-# Calculate total allocated bandwidth in Gbps
-baseline_bandwidth = data["10"]["Allocated_Bandwidth"].sum()
-total_new_alloc_bandwidth = [baseline_bandwidth] + [data[edge]["New_Allocated_Bandwidth"].sum() for edge in edge_counts]
+    csv_path = os.path.join(out_folder, 'consolidated_metrics.csv')
+    metrics.to_csv(csv_path, index=False)
+    
+    print(f"Consolidated metrics saved to {csv_path}")
+    return metrics
 
-# Calculate percentage reduction compared to baseline
-percentage_reduction = [None] + [(baseline_bandwidth - val) / baseline_bandwidth * 100 for val in total_new_alloc_bandwidth[1:]]
+# ==============================================
+# PART 2: PLOTTING FROM CONSOLIDATED CSV
+# ==============================================
 
-# Set font configurations
-plt.rcParams.update({
-    'font.family': 'Times New Roman',
-    'axes.titlesize': 16,
-    'axes.labelsize': 16,
-    'axes.titleweight': 'bold',
-    'axes.labelweight': 'bold',
-    'xtick.labelsize': 14,
-    'ytick.labelsize': 14
-})
+def plot_from_consolidated_csv():
+    """Generate all plots from the consolidated CSV file."""
+    # Set visual styling
+    plt.rcParams.update({
+        'font.family': 'Times New Roman',
+        'axes.titlesize': 20,
+        'axes.labelsize': 20,
+        'axes.titleweight': 'bold',
+        'axes.labelweight': 'bold',
+        'xtick.labelsize': 14,
+        'ytick.labelsize': 14
+    })
 
-# Function to plot and save graphs with percentage change labels
-def plot_and_save(data, ylabel, title, filename, baseline_value):
-    plt.figure(figsize=(8, 6))
-    ax = sns.barplot(x=data.index, y=data.values, palette="coolwarm", alpha=1.0)
-    ax.set_ylabel(ylabel)
-    ax.set_xlabel('Number of Edge Nodes')
-    ax.set_title(title)
+    # Load consolidated data
+    csv_path = os.path.join(out_folder, 'decentralized_consolidated_metrics.csv')
+    metrics = pd.read_csv(csv_path)
+    
+    # Convert cluster count to string for categorical plotting
+    metrics['Cluster_Count'] = metrics['Cluster_Count'].astype(str)
 
-    # Add percentage change labels
-    for i, val in enumerate(data.values):
+    def plot_metric(metric: str, ylabel: str, title: str, filename: str, inverted: bool = False):
+        plt.figure(figsize=(10, 7))
+        ax = sns.barplot(x='Cluster_Count', y=metric, data=metrics, palette="viridis")
+        
+        # Get y-axis limits for proper label positioning
+        ymin, ymax = ax.get_ylim()
+        y_range = ymax - ymin
+        offset = y_range * 0.05  # 5% of y-range as offset
+        
+        # Add percentage change annotations
+        baseline = metrics[metric].iloc[0]
+        for i, row in metrics.iterrows():
+            if i == 0:  # Skip baseline
+                continue
+                
+            change = ((row[metric] - baseline) / baseline) * 100
+            current_value = row[metric]
+            
+            # Corrected placement for Resource Allocation (inside the bar at the top)
+            if metric == 'Resource_Allocation':
+                change_text = f"+{change:.1f}%" if change >= 0 else f"{change:.1f}%"
+                label_y = current_value * 0.98  # 98% of bar height to keep text inside
+                ax.text(i, label_y, change_text, 
+                        ha='center', va='top',
+                        fontsize=16, color='red',
+                        bbox=dict(facecolor='white', alpha=0.8, 
+                                edgecolor='none', pad=1))
+            
+            # Corrected placement for Signal Strength (inverted bars, bottom inside the bar)
+            elif inverted:  # For inverted metrics like Signal Strength (higher is better)
+                # Always show positive changes with + sign
+                label_y = current_value + offset  # Position above the bar
+                va = 'bottom'
+                change_text = f"+{abs(change):.1f}%"  # Force positive sign for clarity
+                
+                ax.text(i, label_y, change_text,
+                        ha='center', va=va,
+                        fontsize=16, color='red',
+                        bbox=dict(facecolor='white', alpha=0.8,
+                                edgecolor='none', pad=1))
+            
+            # Default placement for other metrics (Latency, Distance, etc.)
+            else:
+                if change < 0:
+                    label_y = current_value - offset
+                    va = 'top'
+                    change_text = f"{change:+.1f}%"
+                else:
+                    label_y = current_value + offset
+                    va = 'bottom'
+                    change_text = f"+{change:.1f}%"
+                
+                ax.text(i, label_y, change_text, 
+                        ha='center', va=va,
+                        fontsize=18, color='red',
+                        bbox=dict(facecolor='white', alpha=0.8, 
+                                edgecolor='none', pad=1))
+        
+        ax.set(xlabel='Number of Edge Nodes', ylabel=ylabel, title=title)
+        plt.tight_layout()
+        plt.savefig(os.path.join(output_folder, f"{filename}.png"), dpi=300)
+        plt.close()
+    
+    # Generate individual plots
+    plot_metric('Latency', 'Latency (ms)', 'Average Latency Comparison', 'latency_comparison')
+    plot_metric('Signal_Strength', 'Signal Strength (dBm)', 
+               'Average Signal Strength Comparison', 'signal_strength_comparison',
+               inverted=True)  # Signal strength is inverted (higher is better)
+    plot_metric('Distance', 'Distance (meters)', 'Average Distance Comparison', 'distance_comparison')
+    plot_metric('Resource_Allocation', 'Resource Allocation (%)', 
+               'Average Resource Allocation Comparison', 'resource_allocation_comparison')
+
+    # Bandwidth plot (special handling for size)
+    plt.figure(figsize=(10, 7))
+    ax = sns.barplot(x='Cluster_Count', y='Allocated_Bandwidth', data=metrics, palette="viridis")
+    
+    # Get y-axis limits
+    ymin, ymax = ax.get_ylim()
+    y_range = ymax - ymin
+    offset = y_range * 0.05
+    
+    # Add percentage change annotations
+    baseline = metrics['Allocated_Bandwidth'].iloc[0]
+    for i, row in metrics.iterrows():
         if i == 0:
             continue
-        percentage_change = ((val - baseline_value) / baseline_value) * 100
-        ax.text(i, val + 0.1, f"{percentage_change:+.2f}%", ha='center', fontsize=13, color='red', fontweight='bold')
-
+        change = ((row['Allocated_Bandwidth'] - baseline) / baseline) * 100
+        
+        if change < 0:  # Improvement (reduction)
+            label_y = row['Allocated_Bandwidth'] - offset
+            va = 'top'
+            change_text = f"{change:+.1f}%"
+        else:  # Degradation (increase)
+            label_y = row['Allocated_Bandwidth'] + offset
+            va = 'bottom'
+            change_text = f"+{change:.1f}%"
+        
+        ax.text(i, label_y, change_text, 
+               ha='center', va=va,
+               fontsize=16, color='red',
+               bbox=dict(facecolor='white', alpha=0.8, 
+                        edgecolor='none', pad=1))
+    
+    ax.set(xlabel='Number of Edge Nodes', 
+           ylabel='Total Allocated Bandwidth (KBps)',
+           title='Total Allocated Bandwidth Comparison')
     plt.tight_layout()
-    plt.savefig(os.path.join(output_folder, f"{filename}.png"), dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(output_folder, "total_allocated_bandwidth.png"), dpi=300)
     plt.close()
 
-# Use '1' as the baseline for percentage change calculations
-baseline_latency = avg_latency['1']
-baseline_signal_strength = avg_signal_strength['1']
-baseline_distance = avg_distance['1']
+    print(f"All plots saved to {output_folder}")
 
-# Generate and save graphs with percentage labels
-plot_and_save(avg_latency, 'Latency (ms)', 'Average Latency Comparison', 'latency_comparison', baseline_latency)
-plot_and_save(avg_signal_strength, 'Signal Strength (dBm)', 'Average Signal Strength Comparison', 'signal_strength_comparison', baseline_signal_strength)
-plot_and_save(avg_distance, 'Distance (meters)', 'Average Distance Comparison', 'distance_comparison', baseline_distance)
+# ==============================================
+# MAIN EXECUTION
+# ==============================================
 
-# Corrected section for total allocated bandwidth comparison
-edge_counts = sorted(data.keys(), key=int)  # Ensure correct numeric sorting
-total_new_alloc_bandwidth = [baseline_bandwidth] + [data[edge]["New_Allocated_Bandwidth"].sum() for edge in edge_counts]
-
-# Plot and save total allocated bandwidth comparison with percentage reduction labels
-plt.figure(figsize=(12, 8))
-ax = sns.barplot(x=["1"] + edge_counts, y=total_new_alloc_bandwidth, palette="coolwarm")
-plt.xlabel("Number of Edge Nodes", fontsize=18, fontweight='bold')
-plt.ylabel("Total Allocated Bandwidth (KBps)", fontsize=18, fontweight='bold')
-plt.title("Total Allocated Bandwidth Comparison", fontsize=20, fontweight='bold')
-
-# Add percentage reduction labels for bandwidth
-for i, reduction in enumerate(percentage_reduction[1:], start=1):
-    if reduction is not None:
-        ax.text(i, total_new_alloc_bandwidth[i] - 0.1, f"-{abs(reduction):.2f}%", ha='center', fontsize=13, color='red', fontweight='bold')
-
-plt.savefig(os.path.join(output_folder, "total_allocated_bandwidth.png"), dpi=300, bbox_inches='tight')
-plt.close()
-
-print("All graphs have been saved in the 'graphs/results' folder.")
+if __name__ == "__main__":
+    # Step 1: Calculate and save all metrics
+    consolidated_metrics_path = 'output/post/decentralized_consolidated_metrics.csv'
+    
+    # Step 1: Calculate and save all metrics (only if file doesn't exist)
+    if not os.path.exists(consolidated_metrics_path):
+        metrics_df = calculate_and_save_metrics()
+    else:
+        print(f"Using existing consolidated metrics file: {consolidated_metrics_path}")
+    
+    # Step 2: Generate plots from consolidated data
+    plot_from_consolidated_csv()

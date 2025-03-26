@@ -1,8 +1,8 @@
-Algorithm,Average_Distance,Average_Distance_Rank,Silhouette_Score,Silhouette_Score_Rank,Davies_Bouldin_Index,Davies_Bouldin_Index_Rank,Calinski_Harabasz_Index,Calinski_Harabasz_Index_Rank
-meanshift,497.007636,1.0,0.324483,2.0,0.902343,2.0,7151.693353,1.0
-optics,497.007636,1.0,0.324483,2.0,0.902343,2.0,7151.693353,1.0
-kmeans,497.023062,3.0,0.324483,2.0,0.902343,2.0,7151.693353,1.0
-hierarchical,498.348802,4.0,0.295187,6.0,0.923155,5.0,5990.016818,6.0
-dbscan,500.641362,5.0,0.325184,1.0,0.890922,1.0,7013.803287,4.0
-divisive,511.803597,6.0,0.279784,7.0,0.984692,6.0,6244.380947,5.0
-gmm,521.537868,7.0,0.307504,5.0,13.624563,7.0,5376.079385,7.0
+Algorithm,Average_Distance,Average_Distance_Rank,Silhouette_Score,Silhouette_Score_Rank,Calinski_Harabasz_Index,Calinski_Harabasz_Index_Rank
+meanshift,497.007636,1.0,0.324483,2.0,7151.693353,1.0
+optics,497.007636,1.0,0.324483,2.0,7151.693353,1.0
+kmeans,497.023062,3.0,0.324483,2.0,7151.693353,1.0
+hierarchical,498.348802,4.0,0.295187,6.0,5990.016818,6.0
+dbscan,500.641362,5.0,0.325184,1.0,7013.803287,4.0
+divisive,511.803597,6.0,0.279784,7.0,6244.380947,5.0
+gmm,521.537868,7.0,0.307504,5.0,5376.079385,7.0

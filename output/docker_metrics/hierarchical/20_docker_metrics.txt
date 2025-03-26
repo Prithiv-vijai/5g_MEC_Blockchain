@@ -1,40 +1,40 @@
-Average CPU usage for edge_1: 7.08%
-Average memory usage for edge_1: 122.32 MiB
-Average CPU usage for edge_2: 1.39%
-Average memory usage for edge_2: 122.21 MiB
-Average CPU usage for edge_3: 6.20%
-Average memory usage for edge_3: 121.86 MiB
-Average CPU usage for edge_4: 1.69%
-Average memory usage for edge_4: 123.17 MiB
-Average CPU usage for edge_5: 7.29%
-Average memory usage for edge_5: 124.08 MiB
-Average CPU usage for edge_6: 8.58%
-Average memory usage for edge_6: 121.48 MiB
-Average CPU usage for edge_7: 0.64%
-Average memory usage for edge_7: 123.74 MiB
-Average CPU usage for edge_8: 0.78%
-Average memory usage for edge_8: 130.52 MiB
-Average CPU usage for edge_9: 1.53%
-Average memory usage for edge_9: 128.16 MiB
-Average CPU usage for edge_10: 1.58%
-Average memory usage for edge_10: 121.77 MiB
-Average CPU usage for edge_11: 7.76%
-Average memory usage for edge_11: 122.23 MiB
-Average CPU usage for edge_12: 4.88%
-Average memory usage for edge_12: 125.21 MiB
-Average CPU usage for edge_13: 0.95%
-Average memory usage for edge_13: 122.60 MiB
-Average CPU usage for edge_14: 1.49%
-Average memory usage for edge_14: 124.93 MiB
-Average CPU usage for edge_15: 7.06%
-Average memory usage for edge_15: 128.76 MiB
-Average CPU usage for edge_16: 0.87%
-Average memory usage for edge_16: 127.70 MiB
-Average CPU usage for edge_17: 0.61%
-Average memory usage for edge_17: 121.43 MiB
-Average CPU usage for edge_18: 4.83%
-Average memory usage for edge_18: 125.26 MiB
-Average CPU usage for edge_19: 0.44%
-Average memory usage for edge_19: 125.30 MiB
-Average CPU usage for edge_20: 1.07%
-Average memory usage for edge_20: 123.33 MiB
+Average CPU usage for edge_1: 7.80%
+Average memory usage for edge_1: 125.96 MiB
+Average CPU usage for edge_2: 2.67%
+Average memory usage for edge_2: 125.56 MiB
+Average CPU usage for edge_3: 6.22%
+Average memory usage for edge_3: 127.09 MiB
+Average CPU usage for edge_4: 1.32%
+Average memory usage for edge_4: 125.77 MiB
+Average CPU usage for edge_5: 7.97%
+Average memory usage for edge_5: 128.47 MiB
+Average CPU usage for edge_6: 6.06%
+Average memory usage for edge_6: 126.07 MiB
+Average CPU usage for edge_7: 0.45%
+Average memory usage for edge_7: 127.42 MiB
+Average CPU usage for edge_8: 0.80%
+Average memory usage for edge_8: 161.83 MiB
+Average CPU usage for edge_9: 1.37%
+Average memory usage for edge_9: 132.08 MiB
+Average CPU usage for edge_10: 1.41%
+Average memory usage for edge_10: 127.02 MiB
+Average CPU usage for edge_11: 5.92%
+Average memory usage for edge_11: 128.98 MiB
+Average CPU usage for edge_12: 4.48%
+Average memory usage for edge_12: 124.64 MiB
+Average CPU usage for edge_13: 1.12%
+Average memory usage for edge_13: 127.63 MiB
+Average CPU usage for edge_14: 1.66%
+Average memory usage for edge_14: 121.93 MiB
+Average CPU usage for edge_15: 3.75%
+Average memory usage for edge_15: 124.08 MiB
+Average CPU usage for edge_16: 0.62%
+Average memory usage for edge_16: 125.43 MiB
+Average CPU usage for edge_17: 0.77%
+Average memory usage for edge_17: 125.42 MiB
+Average CPU usage for edge_18: 6.01%
+Average memory usage for edge_18: 124.49 MiB
+Average CPU usage for edge_19: 1.06%
+Average memory usage for edge_19: 128.84 MiB
+Average CPU usage for edge_20: 0.60%
+Average memory usage for edge_20: 128.97 MiB

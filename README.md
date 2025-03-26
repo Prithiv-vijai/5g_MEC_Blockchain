@@ -1,6 +1,6 @@
 docker build -t lightgbm-container .
 
-docker-compose up
+docker-compose up -d
 
 
 eMBB -  Background_Download, File_Download, Streaming, Video_Streaming

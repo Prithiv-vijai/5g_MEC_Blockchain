@@ -1,4 +1,4 @@
-Average CPU usage for edge_1: 32.11%
-Average memory usage for edge_1: 133.68 MiB
-Average CPU usage for edge_2: 30.20%
-Average memory usage for edge_2: 129.32 MiB
+Average CPU usage for edge_1: 33.49%
+Average memory usage for edge_1: 125.17 MiB
+Average CPU usage for edge_2: 30.37%
+Average memory usage for edge_2: 122.03 MiB

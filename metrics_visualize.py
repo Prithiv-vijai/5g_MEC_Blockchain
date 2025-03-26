@@ -2,8 +2,6 @@ import os
 import re
 import pandas as pd
 import matplotlib.pyplot as plt
-from collections import defaultdict
-import matplotlib
 import numpy as np
 
 # Set Times New Roman font for all text
@@ -16,16 +14,17 @@ os.makedirs("graphs/results/metrics", exist_ok=True)
 # Define the directory structure based on your image
 base_dir = "output"
 metrics_dir = os.path.join(base_dir, "metrics")
-algorithms = ["dbscan", "divisive", "gmm", "hierarchical", "kmeans", "meanshift", "optics"]
+algorithms = ['meanshift', 'optics', 'kmeans']
 
-# Metrics we want to extract and plot
-target_metrics = [
-    "process_resident_memory_bytes",
-    "process_cpu_seconds_total",
-    "request_latency_seconds_sum",
-    "request_throughput_total",
-    "request_response_time_seconds"
-]
+# Define specific colors and markers for each algorithm
+algorithm_styles = {
+    'kmeans': {'color': '#1f77b4', 'marker': 'o'},
+    'optics': {'color': '#d62728', 'marker': '^'},
+    'meanshift': {'color': '#9467bd', 'marker': 'v'},
+}
+
+# Only target the 'request_response_time_seconds' metric
+target_metric = "request_response_time_seconds"
 
 def parse_metrics_file(file_path):
     """Parse a metrics file and extract values for each edge"""
@@ -54,7 +53,7 @@ def parse_metrics_file(file_path):
                 metric_name = parts[0]
                 value = float(parts[1])
             
-            if metric_name in target_metrics:
+            if metric_name == target_metric:
                 edge_metrics[metric_name] = value
         
         if edge_metrics:
@@ -101,40 +100,45 @@ for algorithm in algorithms:
 # Convert to DataFrame
 df = pd.DataFrame(all_data)
 
-# Plot each metric
-for metric in target_metrics:
-    plt.figure(figsize=(10, 6))  # Slightly taller figure to accommodate legend
-    
-    # Group by algorithm and plot
-    for algorithm in algorithms:
-        algorithm_data = df[df['algorithm'] == algorithm]
-        if not algorithm_data.empty:
-            algorithm_data = algorithm_data.sort_values('edge_count')
-            plt.plot(algorithm_data['edge_count'], algorithm_data[metric], 
-                    label=algorithm, marker='o', linewidth=2 ,linestyle='--')
-    
-    # Set x-ticks to show even numbers from 2 to 20
-    plt.xticks(np.arange(2, 21, 2))
-    
-    plt.xlabel('Number of Edges', fontsize=18)
-    plt.ylabel(metric.replace('_', ' ').title(), fontsize=18)
-    plt.title(f'{metric.replace("_", " ").title()} vs Number of Edges', fontsize=21, pad=20 , fontweight="bold")
-    plt.grid(True)
-    
-    # Adjust legend position - 4 items per row below the plot
-    plt.legend(bbox_to_anchor=(0.46, -0.15), loc='upper center', 
-              ncol=4, fontsize=18)
-    
-    # Adjust layout to make room for the legend
-    plt.tight_layout()
-    plt.subplots_adjust(bottom=0.10)  # Increase bottom margin
-    
-    # Save the plot
-    safe_metric_name = metric.replace('_', '-')
-    plot_filename = os.path.join("graphs", "results", "metrics", f"{safe_metric_name}.png")
-    plt.savefig(plot_filename, bbox_inches='tight', dpi=400)
-    plt.close()
-    
-    print(f"Saved plot for {metric} to {plot_filename}")
+# Plot only 'request_response_time_seconds'
+plt.figure(figsize=(10, 6))  # Slightly taller figure to accommodate legend
 
-print("All plots generated successfully!")
+# Group by algorithm and plot
+for algorithm in algorithms:
+    algorithm_data = df[df['algorithm'] == algorithm]
+    if not algorithm_data.empty:
+        algorithm_data = algorithm_data.sort_values('edge_count')
+        style = algorithm_styles.get(algorithm, {'color': '#333333', 'marker': 'o'})
+        plt.plot(
+            algorithm_data['edge_count'],
+            algorithm_data[target_metric],
+            label=algorithm,
+            marker=style['marker'],
+            linewidth=2,
+            linestyle='--',
+            color=style['color']
+        )
+
+# Set x-ticks to show even numbers from 2 to 20
+plt.xticks(np.arange(2, 21, 2))
+
+plt.xlabel('Number of Edges', fontsize=18)
+plt.ylabel(target_metric.replace('_', ' ').title(), fontsize=18)
+plt.title(f'{target_metric.replace("_", " ").title()} vs Number of Edges', fontsize=21, pad=20, fontweight="bold")
+plt.grid(True)
+
+# Adjust legend position - 4 items per row below the plot
+plt.legend(bbox_to_anchor=(0.46, -0.15), loc='upper center', 
+           ncol=4, fontsize=18)
+
+# Adjust layout to make room for the legend
+plt.tight_layout()
+plt.subplots_adjust(bottom=0.10)  # Increase bottom margin
+
+# Save the plot
+safe_metric_name = target_metric.replace('_', '-')
+plot_filename = os.path.join("graphs", "results", "metrics", f"{safe_metric_name}.png")
+plt.savefig(plot_filename, bbox_inches='tight', dpi=400)
+plt.close()
+
+print(f"Saved plot for {target_metric} to {plot_filename}")

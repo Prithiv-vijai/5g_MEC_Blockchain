@@ -10,7 +10,7 @@ import time
 
 # Define the output folder
 output_folder = "output/pre"
-graphs_folder = "graphs/results"
+graphs_folder = "graphs/results/cluster_plots"
 
 # Create the graphs folder if it doesn't exist
 os.makedirs(graphs_folder, exist_ok=True)

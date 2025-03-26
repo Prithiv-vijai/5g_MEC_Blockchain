@@ -46,7 +46,7 @@ def predict():
     # Apply the missing part: scale Required_Bandwidth and adjust signal strength
     user_data_1['Required_Bandwidth'] *= 0.8
     adjusted_signal_strength = signal_strength - abs(updated_signal_strength - signal_strength)
-    user_data_1['Updated_Signal_Strength'] = adjusted_signal_strength
+    user_data_2['Updated_Signal_Strength'] = adjusted_signal_strength
 
     # Step 1: Predict new allocated bandwidth using Model 1
     prediction1 = model1.predict(user_data_1)
