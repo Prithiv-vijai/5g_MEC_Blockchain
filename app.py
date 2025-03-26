@@ -43,11 +43,6 @@ def predict():
     signal_strength = input_data['signal_strength']
     updated_signal_strength = input_data['updated_signal_strength']
 
-    # Apply the missing part: scale Required_Bandwidth and adjust signal strength
-    user_data_1['Required_Bandwidth'] *= 0.8
-    adjusted_signal_strength = signal_strength - abs(updated_signal_strength - signal_strength)
-    user_data_2['Updated_Signal_Strength'] = adjusted_signal_strength
-
     # Step 1: Predict new allocated bandwidth using Model 1
     prediction1 = model1.predict(user_data_1)
     new_allocated_bandwidth = prediction1[0] if len(prediction1) > 0 else 0
@@ -61,10 +56,6 @@ def predict():
     # Step 4: Predict new resource allocation using Model 2
     prediction2 = model2.predict(user_data_2)
     new_resource_allocation = prediction2[0] if len(prediction2) > 0 else 0
-
-    # Step 5: Cap resource allocation at 99 if necessary
-    if new_resource_allocation > 99:
-        new_resource_allocation = 99
 
     # Calculate latency and response time
     latency = time.time() - start_time
