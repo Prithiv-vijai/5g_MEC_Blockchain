@@ -13,7 +13,7 @@ X1 = data[['Application_Type', 'Signal_Strength', 'Latency', 'Required_Bandwidth
 y1 = data['Allocated_Bandwidth']
 
 # Model 2: Predicts Resource Allocation
-X2 = data[['Signal_Strength', 'Latency', 'Required_Bandwidth', 'Allocated_Bandwidth']]
+X2 = data[['Application_Type','Signal_Strength', 'Latency', 'Required_Bandwidth', 'Allocated_Bandwidth']]
 y2 = data['Resource_Allocation']
 
 # Split data

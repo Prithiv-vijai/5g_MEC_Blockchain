@@ -8,7 +8,7 @@ PL_d0 = 36.6  # Path loss at reference distance in dB
 n = 3.5  # Adjusted path loss exponent (urban environment)
 c = 1e8  # Effective propagation speed in m/s
 d0 = 1  # Reference distance in meters
-k = 0.7  # Reduction factor for latency-based distance
+
 
 # Output filename
 output_filename = 'simulated_dataset.csv'
@@ -24,7 +24,7 @@ else:
     augmented_dataset['d_signal_strength'] = d0 * 10**((Pt - augmented_dataset['Signal_Strength'] - PL_d0) / (10 * n))
 
     # Calculate latency-based distance with reduction factor
-    augmented_dataset['d_latency'] = (((c * augmented_dataset['Latency'] * 1e-3) / 2) * k) / 1e3  # Latency in ms
+    augmented_dataset['d_latency'] = ((c * augmented_dataset['Latency'] * 1e-3) / 2)  # Latency in ms
 
     # Calculate combined distance
     augmented_dataset['Distance_meters'] = (augmented_dataset['d_signal_strength'] + augmented_dataset['d_latency']) / 2

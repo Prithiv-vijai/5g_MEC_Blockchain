@@ -26,7 +26,7 @@ progress_bar = tqdm(total=total_rows, desc="Processing Users", unit="user")
 
 # Define columns for input
 input_columns_1 = ['Application_Type', 'Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth']
-input_columns_2 = ['Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth', 'Allocated_Bandwidth']
+input_columns_2 = ['Application_Type','Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth', 'Allocated_Bandwidth']
 
 executor = ThreadPoolExecutor(max_workers=5)
 
@@ -80,9 +80,7 @@ for frame in range(total_rows):
         new_allocated_bandwidth = 'Error'
         new_resource_allocation = 'Error'
 
-    # Ensure resource allocation is below 99
-    if new_resource_allocation != 'Error' and new_resource_allocation > 99:
-        new_resource_allocation = 99
+
 
     # Prepare data for CSV
     result_data = {

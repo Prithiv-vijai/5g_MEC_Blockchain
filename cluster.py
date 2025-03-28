@@ -49,16 +49,21 @@ def normalize_coordinates(df):
     df['y_coordinate'] = 198 * (y - y.min()) / (y.max() - y.min()) - 99
     return df
 
-# Function to update signal strength and latency
 def update_signal_latency(df):
-    df['Updated_Signal_Strength'] = df.apply(
-        lambda row: row['Signal_Strength'] * (row['New_Distance'] / row['Distance_meters']) ** reference_factor
-        if row['New_Distance'] != 0 else row['Signal_Strength'], axis=1
-    )
-    df['Updated_Latency'] = df.apply(
-        lambda row: row['Latency'] * (row['New_Distance'] / row['Distance_meters']) ** scaling_factor
-        if row['Distance_meters'] != 0 else row['Latency'], axis=1
-    )
+    # Constants (same as in your original setup)
+    Pt = 46  # Transmit power in dBm
+    PL_d0 = 36.6  # Path loss at reference distance in dB
+    n = 3.5  # Path loss exponent (urban environment)
+    c = 1e8  # Effective propagation speed in m/s
+    d0 = 1  # Reference distance in meters
+    
+    # Update Signal Strength using inverse path loss model
+    df['Updated_Signal_Strength'] = Pt - PL_d0 - (10 * n * np.log10(df['New_Distance']/d0))
+    
+    # Update Latency using inverse propagation delay model
+    # Latency in milliseconds = (2 * distance) / (speed of light * 1000)
+    df['Updated_Latency'] = (2 * df['New_Distance']) / (c) * 1000  # Convert to ms
+    
     return df
 
 
