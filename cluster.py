@@ -3,10 +3,11 @@ import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering, MeanShift, OPTICS
 from sklearn.mixture import GaussianMixture
+from scipy.spatial.distance import cdist
 from sklearn.neighbors import NearestNeighbors
 
 # Load environment variables
-num_containers_list = [12,14,16,18,20]  # Cluster counts to test
+num_containers_list = [2,4,6,8,10,12,14,16,18,20]  # Cluster counts to test
 output_folder = os.environ.get("OUTPUT_FOLDER", "output/pre")  # Default: 'pre' directory
 os.makedirs(output_folder, exist_ok=True)
 
@@ -100,7 +101,6 @@ def run_kmeans(df, coordinates, n_clusters, output_path):
     # Save the updated dataset
     df.to_csv(output_path, index=False)
 
-# Function to run DBSCAN clustering
 def run_dbscan(df, coordinates, n_clusters, output_path):
     # Estimate eps using k-nearest neighbors
     neigh = NearestNeighbors(n_neighbors=5)
@@ -114,43 +114,52 @@ def run_dbscan(df, coordinates, n_clusters, output_path):
 
     # Post-processing to enforce n_clusters
     unique_labels = np.unique(labels)
-    if len(unique_labels) > n_clusters:
-        # Merge smaller clusters into the largest cluster
-        largest_cluster = np.argmax(np.bincount(labels[labels != -1]))
-        labels[labels != largest_cluster] = largest_cluster
-    elif len(unique_labels) < n_clusters:
-        # Split the largest cluster into smaller clusters
-        largest_cluster = np.argmax(np.bincount(labels[labels != -1]))
-        largest_cluster_indices = np.where(labels == largest_cluster)[0]
-        kmeans = KMeans(n_clusters=n_clusters - len(unique_labels) + 1, random_state=42)
-        sub_labels = kmeans.fit_predict(coordinates[largest_cluster_indices])
-        labels[largest_cluster_indices] = sub_labels + len(unique_labels)
+    
+    while True:
+        # Calculate current centroids (exclude noise)
+        centroids = np.array([coordinates[labels == label].mean(axis=0) 
+                          for label in unique_labels if label != -1])
+        
+        # Exit condition
+        if len(centroids) == n_clusters:
+            break
+            
+        # Case 1: Too many clusters (merge closest pair)
+        if len(centroids) > n_clusters:
+            from scipy.spatial.distance import cdist
+            dist_matrix = cdist(centroids, centroids)
+            np.fill_diagonal(dist_matrix, np.inf)
+            i, j = np.unravel_index(np.argmin(dist_matrix), dist_matrix.shape)
+            # Merge cluster j into i
+            labels[labels == unique_labels[j]] = unique_labels[i]
+            
+        # Case 2: Too few clusters (split largest)
+        elif len(centroids) < n_clusters:
+            largest_cluster = np.argmax(np.bincount(labels[labels != -1]))
+            largest_indices = np.where(labels == largest_cluster)[0]
+            kmeans = KMeans(n_clusters=n_clusters - len(centroids) + 1, random_state=42)
+            sub_labels = kmeans.fit_predict(coordinates[largest_indices])
+            labels[largest_indices] = sub_labels + max(unique_labels) + 1
+        
+        unique_labels = np.unique(labels)
 
+    # Final centroids (edge node positions)
+    centroids = np.array([coordinates[labels == label].mean(axis=0) 
+                        for label in unique_labels if label != -1])
+    
+    # Assign to DataFrame (same as your original code)
     df['Cluster'] = labels
-
-    # Calculate centroids for DBSCAN clusters
-    unique_labels = np.unique(labels)
-    centroids = np.array([coordinates[labels == label].mean(axis=0) for label in unique_labels if label != -1])
-
-    # Get the cluster centroids (new container positions)
     container_positions = {
         5001 + i: {'lat': centroid[1], 'lon': centroid[0]}
         for i, centroid in enumerate(centroids)
     }
-
-    # Assign users to the nearest edge node and calculate new distance
     df[['Assigned_Edge_Node', 'New_Distance']] = df.apply(
         lambda row: find_nearest_edge(row['x_coordinate'], row['y_coordinate'], container_positions),
         axis=1, result_type='expand'
     )
-
-    # Normalize coordinates
     df = normalize_coordinates(df)
-    # Update signal strength and latency
     df = update_signal_latency(df)
-    # Assign Network Slices based on Application Type
     df['Network_Slice'] = df['Application_Type'].apply(assign_network_slice)
-    # Save the updated dataset
     df.to_csv(output_path, index=False)
     
     
@@ -274,26 +283,69 @@ def run_gmm(df, coordinates, n_clusters, output_path):
 
 # Function to run  OPTICS clustering
 def run_optics(df, coordinates, n_clusters, output_path):
+    # Step 1: Run OPTICS clustering
     optics = OPTICS(min_samples=5)
     labels = optics.fit_predict(coordinates)
-
-    # Post-processing to enforce n_clusters
-    unique_labels = np.unique(labels)
-    if len(unique_labels) != n_clusters:
-        # Use KMeans to enforce the exact number of clusters
-        kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+    
+    # Step 2: Post-processing to enforce n_clusters
+    unique_labels = np.unique(labels[labels != -1])  # Exclude noise (-1)
+    
+    # Case 1: Too many clusters (merge)
+    if len(unique_labels) > n_clusters:
+        # Calculate current centroids
+        centroids = np.array([coordinates[labels == label].mean(axis=0) 
+                            for label in unique_labels])
+        
+        # Iteratively merge closest clusters until we reach n_clusters
+        while len(unique_labels) > n_clusters:
+            # Compute pairwise distances between centroids
+            dist_matrix = cdist(centroids, centroids)
+            np.fill_diagonal(dist_matrix, np.inf)
+            
+            # Find two closest clusters
+            i, j = np.unravel_index(np.argmin(dist_matrix), dist_matrix.shape)
+            
+            # Merge cluster j into cluster i
+            labels[labels == unique_labels[j]] = unique_labels[i]
+            
+            # Recalculate centroids and unique labels
+            unique_labels = np.unique(labels[labels != -1])
+            centroids = np.array([coordinates[labels == label].mean(axis=0) 
+                               for label in unique_labels])
+    
+    # Case 2: Too few clusters or noise present (use K-Means on the clustered points)
+    if len(unique_labels) < n_clusters or -1 in labels:
+        # Get indices of clustered points (non-noise)
+        clustered_indices = np.where(labels != -1)[0]
+        
+        # If we have some clusters, use them as initialization
+        if len(unique_labels) > 0:
+            init_centers = np.array([coordinates[labels == label].mean(axis=0) 
+                                   for label in unique_labels])
+            # Pad with random points if needed
+            if len(init_centers) < n_clusters:
+                additional = coordinates[np.random.choice(
+                    clustered_indices, 
+                    n_clusters - len(init_centers),
+                    replace=False
+                )]
+                init_centers = np.vstack([init_centers, additional])
+            kmeans = KMeans(n_clusters=n_clusters, init=init_centers, n_init=1, random_state=42)
+        else:
+            # Pure noise case - regular K-Means
+            kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+        
+        # Fit on all points (including former noise)
         labels = kmeans.fit_predict(coordinates)
-
-    # Ensure cluster IDs are in the range 5001 to 5001 + n_clusters - 1
+    
+    # Step 3: Assign final cluster IDs (5001, 5002, ...)
     unique_labels = np.unique(labels)
     cluster_id_mapping = {label: 5001 + i for i, label in enumerate(unique_labels)}
     df['Cluster'] = [cluster_id_mapping[label] for label in labels]
 
-    # Calculate centroids for OPTICS clusters
-    unique_labels = np.unique(labels)
-    centroids = np.array([coordinates[labels == label].mean(axis=0) for label in unique_labels if label != -1])
-
-    # Get the cluster centroids (new container positions)
+    # Step 4: Calculate centroids and container positions
+    centroids = np.array([coordinates[labels == label].mean(axis=0) 
+                         for label in unique_labels])
     container_positions = {
         5001 + i: {'lat': centroid[1], 'lon': centroid[0]}
         for i, centroid in enumerate(centroids)
@@ -317,62 +369,94 @@ def run_optics(df, coordinates, n_clusters, output_path):
     
 
 def run_meanshift(df, coordinates, n_clusters, output_path):
-    # Estimate bandwidth using a heuristic (e.g., median distance)
+    # Step 1: Dynamic bandwidth estimation targeting n_clusters
     from sklearn.neighbors import NearestNeighbors
     neigh = NearestNeighbors(n_neighbors=5)
     neigh.fit(coordinates)
     distances, _ = neigh.kneighbors(coordinates)
-    bandwidth = np.median(distances[:, -1])  # Adjust bandwidth to get approximately n_clusters
-
-    meanshift = MeanShift(bandwidth=bandwidth)
+    
+    # Sort the 5th-nearest neighbor distances and pick nth largest
+    sorted_distances = np.sort(distances[:, -1])
+    bandwidth = sorted_distances[-min(n_clusters, len(sorted_distances))] * 1.5  # Adjusted scaling
+    
+    # Step 2: Run MeanShift with automatic bandwidth selection if needed
+    if bandwidth == 0:  # Fallback for very dense data
+        meanshift = MeanShift()  # Let sklearn estimate bandwidth
+    else:
+        meanshift = MeanShift(bandwidth=bandwidth, bin_seeding=True)
+    
     labels = meanshift.fit_predict(coordinates)
-
-    # Post-processing to enforce n_clusters
     unique_labels = np.unique(labels)
+    
+    # Step 3: Post-processing to enforce exact n_clusters
     if len(unique_labels) != n_clusters:
-        # Use KMeans to enforce the exact number of clusters
-        kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-        labels = kmeans.fit_predict(coordinates)
-
-    # Ensure cluster IDs are in the range 5001 to 5001 + n_clusters - 1
+        # Case 1: Too many clusters - merge smallest into nearest
+        if len(unique_labels) > n_clusters:
+            centroids = np.array([coordinates[labels == label].mean(axis=0) 
+                                for label in unique_labels])
+            
+            # Compute cluster sizes and sort by size (ascending)
+            cluster_sizes = np.array([np.sum(labels == label) for label in unique_labels])
+            size_order = np.argsort(cluster_sizes)
+            
+            # Merge smallest clusters into their nearest neighbor
+            for i in range(len(unique_labels) - n_clusters):
+                target_label = unique_labels[size_order[i]]
+                dists = cdist([centroids[size_order[i]]], centroids)
+                dists[0, size_order[i]] = np.inf  # Ignore self
+                nearest_idx = np.argmin(dists)
+                labels[labels == target_label] = unique_labels[nearest_idx]
+        
+        # Case 2: Too few clusters - split largest using K-Means
+        elif len(unique_labels) < n_clusters:
+            largest_cluster = np.argmax(np.bincount(labels))
+            largest_indices = np.where(labels == largest_cluster)[0]
+            
+            # Use K-Means to split the largest cluster
+            kmeans = KMeans(n_clusters=n_clusters - len(unique_labels) + 1, 
+                           random_state=42)
+            sub_labels = kmeans.fit_predict(coordinates[largest_indices])
+            
+            # Reassign with new labels (offset to avoid conflicts)
+            max_label = np.max(labels)
+            labels[largest_indices] = sub_labels + max_label + 1
+    
+    # Step 4: Final cluster assignment and centroid calculation
     unique_labels = np.unique(labels)
     cluster_id_mapping = {label: 5001 + i for i, label in enumerate(unique_labels)}
     df['Cluster'] = [cluster_id_mapping[label] for label in labels]
-
-    # Calculate centroids for Mean Shift clusters
-    centroids = np.array([coordinates[labels == label].mean(axis=0) for label in np.unique(labels)])
-
-    # Get the cluster centroids (new container positions)
+    
+    # Calculate final centroids
+    centroids = np.array([coordinates[labels == label].mean(axis=0) 
+                        for label in unique_labels])
+    
+    # Step 5: Container positions and edge assignments
     container_positions = {
         5001 + i: {'lat': centroid[1], 'lon': centroid[0]}
         for i, centroid in enumerate(centroids)
     }
-
-    # Assign users to the nearest edge node and calculate new distance
+    
     df[['Assigned_Edge_Node', 'New_Distance']] = df.apply(
         lambda row: find_nearest_edge(row['x_coordinate'], row['y_coordinate'], container_positions),
         axis=1, result_type='expand'
     )
-
-    # Normalize coordinates
+    
+    # Final processing
     df = normalize_coordinates(df)
-    # Update signal strength and latency
     df = update_signal_latency(df)
-    # Assign Network Slices based on Application Type
     df['Network_Slice'] = df['Application_Type'].apply(assign_network_slice)
-    # Save the updated dataset
     df.to_csv(output_path, index=False)
 
 
 # Create output folders for each algorithm
 algorithms = {
-    # 'kmeans': run_kmeans,
+    'kmeans': run_kmeans,
     'dbscan': run_dbscan,
-    # 'hierarchical': run_hierarchical,
-    # 'meanshift': run_meanshift,
-    # 'optics': run_optics,
-    # 'gmm': run_gmm,
-    # 'divisive': run_divisive 
+    'hierarchical': run_hierarchical,
+    'meanshift': run_meanshift,
+    'optics': run_optics,
+    'gmm': run_gmm,
+    'divisive': run_divisive 
 }
 
 for algorithm_name in algorithms:

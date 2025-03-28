@@ -19,10 +19,11 @@ algorithms = ["kmeans", "meanshift", "optics"]
 
 # Define specific colors and markers for each algorithm
 algorithm_styles = {
-    'kmeans': {'color': '#1f77b4', 'marker': 'o'},
-    'optics': {'color': '#d62728', 'marker': '^'},
-    'meanshift': {'color': '#9467bd', 'marker': 'v'},
-}
+        'kmeans': {'color': '#1f77b4', 'marker': 'o', 'label': 'K-Means'},
+        'optics': {'color': '#d62728', 'marker': '^', 'label': 'OPTICS'},
+        'meanshift': {'color': '#9467bd', 'marker': 'v', 'label': 'Mean-Shift'},
+    }
+
 
 def parse_docker_metrics_file(file_path):
     """Parse a docker metrics file and extract values for each edge"""
@@ -121,24 +122,24 @@ def plot_metrics(df, metric, ylabel, title, filename):
                 algorithm_data = algorithm_data.sort_values('edge_count')
                 style = algorithm_styles.get(algorithm, {'color': '#000000', 'marker': 'o'})
                 plt.plot(algorithm_data['edge_count'], algorithm_data[metric], 
-                        label=algorithm.capitalize(),
+                        label=style['label'],
                         color=style['color'],
                         marker=style['marker'],
                         linestyle='--',
-                        markersize=6,
-                        linewidth=2,
+                        markersize=8,
+                        linewidth=2.5,
                         alpha=0.8)
         
         # Set x-ticks to show even numbers from 2 to 20
         plt.xticks(np.arange(2, 21, 2))
         
-        plt.xlabel('Number of Edges', fontsize=18)
-        plt.ylabel(ylabel, fontsize=20)
-        plt.title(title, fontsize=21, pad=20, fontweight="bold")
+        plt.xlabel('Number of Edges', fontsize=22)
+        plt.ylabel(ylabel, fontsize=22)
+        plt.title(title, fontsize=22, pad=20, fontweight="bold")
         
         # Adjust legend position - 4 items per row below the plot
         plt.legend(bbox_to_anchor=(0.46, -0.15), loc='upper center', 
-                  ncol=4, fontsize=20)
+                  ncol=4, fontsize=22)
         
         plt.grid(True)
         

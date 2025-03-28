@@ -11,7 +11,7 @@ BASE_METRICS_DIR = "output/metrics"
 BASE_DOCKER_METRICS_DIR = "output/docker_metrics"
 
 # List of folders to process
-FOLDERS = ["meanshift", "optics", "kmeans"]
+FOLDERS = ["meanshift", "optics", "kmeans","dbscan","divisive","hierarchical","gmm"]
 
 # Ensure base output and metrics directories exist
 os.makedirs(BASE_OUTPUT_DIR, exist_ok=True)

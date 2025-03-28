@@ -18,10 +18,10 @@ algorithms = ['meanshift', 'optics', 'kmeans']
 
 # Define specific colors and markers for each algorithm
 algorithm_styles = {
-    'kmeans': {'color': '#1f77b4', 'marker': 'o'},
-    'optics': {'color': '#d62728', 'marker': '^'},
-    'meanshift': {'color': '#9467bd', 'marker': 'v'},
-}
+        'kmeans': {'color': '#1f77b4', 'marker': 'o', 'label': 'K-Means'},
+        'optics': {'color': '#d62728', 'marker': '^', 'label': 'OPTICS'},
+        'meanshift': {'color': '#9467bd', 'marker': 'v', 'label': 'Mean-Shift'},
+    }
 
 # Only target the 'request_response_time_seconds' metric
 target_metric = "request_response_time_seconds"
@@ -111,10 +111,11 @@ for algorithm in algorithms:
         style = algorithm_styles.get(algorithm, {'color': '#333333', 'marker': 'o'})
         plt.plot(
             algorithm_data['edge_count'],
-            algorithm_data[target_metric],
-            label=algorithm,
+            algorithm_data[target_metric]*1000,
+            label=style['label'],
             marker=style['marker'],
-            linewidth=2,
+            markersize=8,
+            linewidth=2.5,
             linestyle='--',
             color=style['color']
         )
@@ -122,14 +123,14 @@ for algorithm in algorithms:
 # Set x-ticks to show even numbers from 2 to 20
 plt.xticks(np.arange(2, 21, 2))
 
-plt.xlabel('Number of Edges', fontsize=18)
-plt.ylabel(target_metric.replace('_', ' ').title(), fontsize=18)
-plt.title(f'{target_metric.replace("_", " ").title()} vs Number of Edges', fontsize=21, pad=20, fontweight="bold")
+plt.xlabel('Number of Edges', fontsize=22)
+plt.ylabel(target_metric.replace('_', ' ').title(), fontsize=22)
+plt.title(f'{target_metric.replace("_", " ").title()} vs Number of Edges', fontsize=22, pad=20, fontweight="bold")
 plt.grid(True)
 
 # Adjust legend position - 4 items per row below the plot
 plt.legend(bbox_to_anchor=(0.46, -0.15), loc='upper center', 
-           ncol=4, fontsize=18)
+           ncol=4, fontsize=22)
 
 # Adjust layout to make room for the legend
 plt.tight_layout()
@@ -138,7 +139,7 @@ plt.subplots_adjust(bottom=0.10)  # Increase bottom margin
 # Save the plot
 safe_metric_name = target_metric.replace('_', '-')
 plot_filename = os.path.join("graphs", "results", "metrics", f"{safe_metric_name}.png")
-plt.savefig(plot_filename, bbox_inches='tight', dpi=400)
+plt.savefig(plot_filename, bbox_inches='tight', dpi=300)
 plt.close()
 
 print(f"Saved plot for {target_metric} to {plot_filename}")

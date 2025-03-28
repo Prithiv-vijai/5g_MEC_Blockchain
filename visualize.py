@@ -99,7 +99,7 @@ def calculate_and_save_metrics() -> pd.DataFrame:
     # Sort by cluster count and save
     metrics = metrics.sort_values('Cluster_Count').reset_index(drop=True)
 
-    csv_path = os.path.join(out_folder, 'consolidated_metrics.csv')
+    csv_path = os.path.join(out_folder, 'decentralized_consolidated_metrics.csv')
     metrics.to_csv(csv_path, index=False)
     
     print(f"Consolidated metrics saved to {csv_path}")
