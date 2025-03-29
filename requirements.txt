@@ -1,13 +1,7 @@
-pandas
-numpy
-matplotlib
-seaborn
-scikit-learn
-scikit-optimize
-hyperopt
-optuna
-xgboost
 flask
 lightgbm
+pandas
+prometheus-client
+web3
 requests
-prometheus_client
+python-dotenv

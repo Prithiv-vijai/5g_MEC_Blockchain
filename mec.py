@@ -26,10 +26,29 @@ progress_bar = tqdm(total=total_rows, desc="Processing Users", unit="user")
 
 # Define columns for input
 input_columns_1 = ['Application_Type', 'Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth']
-input_columns_2 = ['Application_Type','Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth', 'Allocated_Bandwidth']
-
+input_columns_2 = ['Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth', 'Allocated_Bandwidth']
 executor = ThreadPoolExecutor(max_workers=5)
 
+
+# # Blockchain setup
+ # GANACHE_URL = config['ganache_url']
+ # web3 = Web3(Web3.HTTPProvider(GANACHE_URL))
+ # accounts = web3.eth.accounts[:10]
+ # contract_address = config['contract_address']
+ # abi = config['abi']
+ # contract = web3.eth.contract(address=contract_address, abi=abi)
+ 
+ 
+ 
+ # def log_to_blockchain(user_id, allocated_bandwidth, container_id):
+ #     try:
+ #         web3.eth.default_account = accounts[container_id]
+ #         tx_hash = contract.functions.addAllocation(int(user_id), int(float(allocated_bandwidth))).transact()
+ #         web3.eth.wait_for_transaction_receipt(tx_hash)  # Ensure transaction completes
+ #     except Exception as e:
+ #         print(f"Error logging to blockchain: UserID={user_id}, ContainerID={container_id}, Error={e}")
+ 
+ 
 def send_data_to_container(user_data_1, user_data_2, slice_type, updated_latency, signal_strength, updated_signal_strength, container_port):
     """Send data to container for processing."""
     url = f'http://localhost:{container_port}/predict'

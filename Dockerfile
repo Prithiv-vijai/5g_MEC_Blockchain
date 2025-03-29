@@ -11,6 +11,7 @@ WORKDIR /app
 COPY app.py ./
 COPY model1.txt ./
 COPY model2.txt ./
+COPY mec_config.json .
 COPY requirements.txt ./
 
 # Install required dependencies

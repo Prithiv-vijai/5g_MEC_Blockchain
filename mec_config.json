@@ -1,5 +1,5 @@
 {
-    "ganache_url": "http://127.0.0.1:7545",
+    "ganache_url": "http://host.docker.internal:7545",
     "contract_address": "0x629739ff45aEcff36eAefe9db59F59329eE0b154",
     "abi": [
       {
