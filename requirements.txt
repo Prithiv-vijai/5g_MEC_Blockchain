@@ -1,7 +1,13 @@
-flask
-lightgbm
 pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+lightgbm
+xgboost
+requests
+tqdm
+scipy
+flask
 prometheus-client
 web3
-requests
-python-dotenv

@@ -21,7 +21,7 @@ output_dir = 'graphs/model_output/'
 os.makedirs(output_dir, exist_ok=True)
 
 # Load the dataset
-df = pd.read_csv('NS3/augmented_dataset.csv')
+df = pd.read_csv('augmented_dataset.csv')
 
 # Define models
 models = {

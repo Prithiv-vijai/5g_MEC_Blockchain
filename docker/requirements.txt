@@ -1,0 +1,7 @@
+flask
+lightgbm
+pandas
+prometheus-client
+web3
+requests
+python-dotenv

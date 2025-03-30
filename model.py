@@ -5,7 +5,7 @@ import pandas as pd
 import time
 
 # Load the dataset
-data = pd.read_csv('NS3/augmented_dataset.csv')
+data = pd.read_csv('augmented_dataset.csv')
 
 # Define feature sets and targets
 # Model 1: Predicts Allocated Bandwidth
@@ -67,7 +67,7 @@ print(f"Model 1 trained in {time.time() - start_time:.2f} seconds.")
 
 # Save Model 1
 print("Saving Model 1 as model1.txt...")
-model1.booster_.save_model('model1.txt')
+model1.booster_.save_model('../5g_MEC_Blockchain/docker/model1.txt')
 
 # Train Model 2 (Resource Allocation prediction)
 print("\nTraining Model 2 (Resource Allocation prediction)...")
@@ -78,7 +78,7 @@ print(f"Model 2 trained in {time.time() - start_time:.2f} seconds.")
 
 # Save Model 2
 print("Saving Model 2 as model2.txt...")
-model2.booster_.save_model('model2.txt')
+model2.booster_.save_model('../5g_MEC_Blockchain/docker/model2.txt')
 
 # Predictions
 y1_pred_test = model1.predict(X1_test)  # Model 1 predictions
