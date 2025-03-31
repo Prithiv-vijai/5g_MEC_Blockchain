@@ -52,7 +52,7 @@ python simulate_distance.py
 ### **1.2 Cluster Users for Edge Placement**
 
 ```bash
-python clustering_algorithms.py
+python cluster.py
 ```
 
 - **Input:** `simulated_dataset.csv`
