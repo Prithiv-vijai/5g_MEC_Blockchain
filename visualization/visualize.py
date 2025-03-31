@@ -41,10 +41,10 @@ def calculate_and_save_metrics() -> pd.DataFrame:
     post_files = {str(extract_edge_count(f)): f for f in os.listdir(post_data_folder) 
                  if f.endswith('.csv') and extract_edge_count(f)}
 
-    # Initialize consolidated metrics dataframe
+    # Initialize consolidated metrics dataframe - ADD THROUGHPUT COLUMN
     metrics = pd.DataFrame(columns=[
         'Cluster_Count', 'Latency', 'Signal_Strength', 'Distance',
-        'Resource_Allocation', 'Allocated_Bandwidth'
+        'Resource_Allocation', 'Allocated_Bandwidth', 'Throughput'
     ])
 
     # Process baseline data (10 clusters)
@@ -55,7 +55,8 @@ def calculate_and_save_metrics() -> pd.DataFrame:
         'Signal_Strength': baseline_df['Signal_Strength'].mean(),
         'Distance': baseline_df['Distance_meters'].mean(),
         'Resource_Allocation': None,  # Will be filled from post data
-        'Allocated_Bandwidth': None   # Will be filled from post data
+        'Allocated_Bandwidth': None,  # Will be filled from post data
+        'Throughput': None            # Will be calculated later
     }
 
     # Process pre files (updated metrics)
@@ -67,7 +68,8 @@ def calculate_and_save_metrics() -> pd.DataFrame:
             'Signal_Strength': df['Updated_Signal_Strength'].mean(),
             'Distance': df['New_Distance'].mean(),
             'Resource_Allocation': None,
-            'Allocated_Bandwidth': None
+            'Allocated_Bandwidth': None,
+            'Throughput': None
         }
 
     # Process post files (resource allocation and bandwidth)
@@ -87,7 +89,8 @@ def calculate_and_save_metrics() -> pd.DataFrame:
                 'Signal_Strength': None,
                 'Distance': None,
                 'Resource_Allocation': df['New_Resource_Allocation'].mean(),
-                'Allocated_Bandwidth': df['New_Allocated_Bandwidth'].sum()
+                'Allocated_Bandwidth': df['New_Allocated_Bandwidth'].sum(),
+                'Throughput': None
             }
 
     # Fill baseline resource allocation and bandwidth from 10_cluster post data
@@ -95,6 +98,13 @@ def calculate_and_save_metrics() -> pd.DataFrame:
         post_10 = pd.read_csv(os.path.join(post_data_folder, post_files['10'])).dropna()
         metrics.loc[metrics['Cluster_Count'] == 1, 'Resource_Allocation'] = post_10['Old_Resource_Allocation'].mean()
         metrics.loc[metrics['Cluster_Count'] == 1, 'Allocated_Bandwidth'] = post_10['Allocated_Bandwidth'].sum()
+
+    # CALCULATE THROUGHPUT FOR ALL ROWS
+    # Throughput formula: (Allocated Bandwidth) / (1 + Latency)
+    # We add 1 to latency to avoid division by zero and to account for base transmission time
+    for idx, row in metrics.iterrows():
+        if pd.notnull(row['Allocated_Bandwidth']) and pd.notnull(row['Latency']):
+            metrics.at[idx, 'Throughput'] = row['Allocated_Bandwidth'] / ( row['Latency'])
 
     # Sort by cluster count and save
     metrics = metrics.sort_values('Cluster_Count').reset_index(drop=True)
@@ -104,7 +114,6 @@ def calculate_and_save_metrics() -> pd.DataFrame:
     
     print(f"Consolidated metrics saved to {csv_path}")
     return metrics
-
 # ==============================================
 # PART 2: PLOTTING FROM CONSOLIDATED CSV
 # ==============================================
@@ -191,8 +200,56 @@ def plot_from_consolidated_csv():
         plt.tight_layout()
         plt.savefig(os.path.join(output_folder, f"{filename}.png"), dpi=300)
         plt.close()
+        
+    def plot_throughput():
+        plt.figure(figsize=(10, 7))
+        ax = sns.barplot(x='Cluster_Count', y='Throughput', data=metrics, palette="viridis")
+        
+        # Set consistent y-axis limits with some padding
+        max_throughput = metrics['Throughput'].max()
+        min_throughput = metrics['Throughput'].min()
+        y_padding = (max_throughput - min_throughput) * 0.15  # 15% padding
+        ax.set_ylim([min_throughput - y_padding, max_throughput + y_padding])
+        
+        # Get updated y-axis limits after setting them
+        ymin, ymax = ax.get_ylim()
+        y_range = ymax - ymin
+        offset = y_range * 0.05  # 5% of y-range as offset
+        
+        # Add percentage change annotations with boundary checks
+        baseline = metrics['Throughput'].iloc[0]
+        for i, row in metrics.iterrows():
+            if i == 0:  # Skip baseline
+                continue
+                
+            change = ((row['Throughput'] - baseline) / baseline) * 100
+            current_value = row['Throughput']
+            
+            # Determine label position with boundary checks
+            if change < 0:  # Degradation (label below bar)
+                label_y = max(ymin + offset, current_value - offset)  # Ensure doesn't go below ymin
+                va = 'top'
+                change_text = f"{change:+.1f}%"
+            else:  # Improvement (label above bar)
+                label_y = min(ymax - offset, current_value + offset)  # Ensure doesn't go above ymax
+                va = 'bottom'
+                change_text = f"+{change:.1f}%"
+            
+            ax.text(i, label_y, change_text, 
+                ha='center', va=va,
+                fontsize=16, color='red',
+                bbox=dict(facecolor='white', alpha=0.8, 
+                            edgecolor='none', pad=1))
+        
+        ax.set(xlabel='Number of Edge Nodes', 
+            ylabel='Throughput (KBps/ms)',
+            title='Average Throughput Comparison')
+        plt.tight_layout()
+        plt.savefig(os.path.join(output_folder, "throughput_comparison.png"), dpi=300)
+        plt.close()
     
     # Generate individual plots
+    plot_throughput()
     plot_metric('Latency', 'Latency (ms)', 'Average Latency Comparison', 'latency_comparison')
     plot_metric('Signal_Strength', 'Signal Strength (dBm)', 
                'Average Signal Strength Comparison', 'signal_strength_comparison',
