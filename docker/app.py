@@ -17,7 +17,6 @@ app = Flask(__name__)
 # Create Prometheus metrics
 REQUEST_LATENCY = Summary('request_latency_seconds', 'Time taken to process a request')
 REQUEST_RESPONSE_TIME = Gauge('request_response_time_seconds', 'Response time for each request')
-REQUEST_THROUGHPUT = Counter('request_throughput_total', 'Total number of requests processed')
 
 # Start Prometheus HTTP server on port 8000
 start_http_server(8000)
@@ -107,8 +106,7 @@ def predict():
     REQUEST_LATENCY.observe(latency)
     REQUEST_RESPONSE_TIME.set(latency)
 
-    # Increment throughput
-    REQUEST_THROUGHPUT.inc()
+
 
     # Return both predictions
     return jsonify({
