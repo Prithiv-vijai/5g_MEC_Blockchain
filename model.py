@@ -84,13 +84,3 @@ model2.booster_.save_model('../5g_MEC_Blockchain/docker/model2.txt')
 y1_pred_test = model1.predict(X1_test)  # Model 1 predictions
 y2_pred_test = model2.predict(X2_test)  # Model 2 predictions
 
-# Evaluation
-print("\nModel 1 (Allocated Bandwidth prediction) Evaluation:")
-print(f"Test RMSE: {mean_squared_error(y1_test, y1_pred_test, squared=False):.4f}")
-print(f"Test R2 Score: {r2_score(y1_test, y1_pred_test):.4f}")
-print(f"Test MAE: {mean_absolute_error(y1_test, y1_pred_test):.4f}")
-
-print("\nModel 2 (Resource Allocation prediction) Evaluation:")
-print(f"Test RMSE: {mean_squared_error(y2_test, y2_pred_test, squared=False):.4f}")
-print(f"Test R2 Score: {r2_score(y2_test, y2_pred_test):.4f}")
-print(f"Test MAE: {mean_absolute_error(y2_test, y2_pred_test):.4f}")

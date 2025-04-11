@@ -15,16 +15,6 @@ os.makedirs(output_folder, exist_ok=True)
 df = pd.read_csv('simulated_dataset.csv')
 user_coordinates = df[['x_coordinate', 'y_coordinate']].values
 
-# Constants
-Pt = 46  # Transmit power in dBm
-PL_d0 = 36.6  # Path loss at reference distance in dB
-n = 3.5  # Path loss exponent for urban environment
-d0 = 1  # Reference distance in meters
-c = 1e8  # Effective propagation speed in m/s
-k = 0.7  # Reduction factor for latency-based distance
-scaling_factor = 0.75
-reference_factor = 0.26
-
 # Function to calculate Euclidean distance between two points
 def calculate_distance(x1, y1, x2, y2):
     return np.sqrt((x1 - x2)**2 + (y1 - y2)**2)

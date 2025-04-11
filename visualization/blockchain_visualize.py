@@ -34,37 +34,6 @@ def save_plot(fig, name):
     plt.close(fig)
     print(f"✅ {name}.png saved successfully")
 
-# Plot 1: Average Transactions per Account (Fixed + Sorted)
-def plot_avg_transactions(data):
-    avg_tx = {edges: df['from'].value_counts().mean() for edges, df in data.items()}
-    avg_tx_df = pd.DataFrame(avg_tx.items(), columns=["Edges", "Avg_Transactions"])
-    avg_tx_df = avg_tx_df.sort_values(by="Edges", ascending=True)
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(x="Edges", y="Avg_Transactions", data=avg_tx_df, ax=ax, palette="viridis", legend=False)
-    plt.title("Average Transactions per Account")
-    plt.xlabel("Number of Edges")
-    plt.ylabel("Average Transactions")
-    plt.grid(True)
-    for i, v in enumerate(avg_tx_df["Avg_Transactions"]):
-        ax.text(i, v, f"{v:.2f}", ha='center', va='bottom', fontsize=10, fontweight='bold')
-    save_plot(fig, "Avg_Transactions")
-
-# Plot 2: Average Gas Usage
-def plot_avg_gas(data):
-    avg_gas = {edges: df['gas_used'].mean() for edges, df in data.items()}
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(x=list(avg_gas.keys()), y=list(avg_gas.values()), ax=ax, hue=list(avg_gas.keys()), legend=False)
-    plt.title("Average Gas Usage")
-    plt.xlabel("Number of Edges")
-    plt.ylabel("Average Gas Used")
-    plt.grid(True)
-    for i, v in enumerate(avg_gas.values()):
-        ax.text(i, v, f"{v:.2f}", ha='center', va='bottom', fontsize=10, fontweight='bold')
-    save_plot(fig, "Avg_Gas_Usage")
-
-# Plot 3: Transaction Frequency Over Relative Time
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 def plot_tx_frequency(data):
     fig, ax = plt.subplots(figsize=(12, 7))
@@ -105,107 +74,13 @@ def plot_tx_frequency(data):
 
     save_plot(fig, "Tx_Frequency")
 
-# Plot 4: Average Transaction Fee
-def plot_avg_tx_fee(data):
-    avg_fee = {edges: df['transaction_fee'].mean() for edges, df in data.items()}
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(x=list(avg_fee.keys()), y=list(avg_fee.values()), ax=ax, hue=list(avg_fee.keys()), legend=False)
-    plt.title("Average Transaction Fee")
-    plt.xlabel("Number of Edges")
-    plt.ylabel("Average Fee")
-    plt.grid(True)
-    for i, v in enumerate(avg_fee.values()):
-        ax.text(i, v, f"{v:.2f}", ha='center', va='bottom', fontsize=10, fontweight='bold')
-    save_plot(fig, "Avg_Transaction_Fee")
+ 
 
-# Plot 5: Throughput vs Time
-def plot_throughput(data):
-    fig, ax = plt.subplots(figsize=(15, 7))
-    for edges, df in data.items():
-        df['throughput'] = df['gas_used'] / df['relative_time']
-        sns.lineplot(x='relative_time', y='throughput', data=df, label=f"{edges} Edges", ax=ax)
-    ax.set_title("Throughput vs Time")
-    ax.set_xlabel("Time (Seconds)")
-    ax.set_ylabel("Throughput")
-    ax.legend()
-    ax.grid(True)
-    save_plot(fig, "Throughput_vs_Time")
-
-# Plot 6: Latency Distribution
-def plot_latency_distribution(data):
-    fig, ax = plt.subplots(figsize=(10, 6))
-    for edges, df in data.items():
-        sns.histplot(df['latency'], bins=30, kde=True, label=f"{edges} Edges", ax=ax)
-    ax.set_title("Latency Distribution")
-    ax.set_xlabel("Latency")
-    ax.set_ylabel("Frequency")
-    ax.legend()
-    ax.grid(True)
-    save_plot(fig, "Latency_Distribution")
-# Plot 7: Gas Usage Distribution
-def plot_gas_distribution(data):
-    fig, ax = plt.subplots(figsize=(12, 6))
-    for edges, df in data.items():
-        sns.histplot(df['gas_used'], bins=30, kde=True, label=f"{edges} Edges", ax=ax)
-    ax.set_title("Gas Usage Distribution")
-    ax.set_xlabel("Gas Used")
-    ax.set_ylabel("Frequency")
-    ax.legend()
-    ax.grid(True)
-    save_plot(fig, "Gas_Usage_Distribution")
-
-# Plot 8: Transaction Fee Distribution
-def plot_fee_distribution(data):
-    fig, ax = plt.subplots(figsize=(12, 6))
-    for edges, df in data.items():
-        sns.histplot(df['transaction_fee'], bins=30, kde=True, label=f"{edges} Edges", ax=ax)
-    ax.set_title("Transaction Fee Distribution")
-    ax.set_xlabel("Transaction Fee")
-    ax.set_ylabel("Frequency")
-    ax.legend()
-    ax.grid(True)
-    save_plot(fig, "Transaction_Fee_Distribution")
-
-# Plot 9: Cumulative Transactions Over Time
-def plot_cumulative_transactions(data):
-    fig, ax = plt.subplots(figsize=(15, 7))
-    for edges, df in data.items():
-        df['cumulative_tx'] = np.arange(1, len(df) + 1)
-        sns.lineplot(x='relative_time', y='cumulative_tx', data=df, label=f"{edges} Edges", ax=ax)
-    ax.set_title("Cumulative Transactions Over Time")
-    ax.set_xlabel("Time (Seconds)")
-    ax.set_ylabel("Cumulative Transactions")
-    ax.legend()
-    ax.grid(True)
-    save_plot(fig, "Cumulative_Transactions")
-
-# Plot 10: Latency vs Gas Used (Scatter Plot)
-def plot_latency_vs_gas(data):
-    fig, ax = plt.subplots(figsize=(12, 6))
-    for edges, df in data.items():
-        sns.scatterplot(x='latency', y='gas_used', data=df, label=f"{edges} Edges", ax=ax)
-    ax.set_title("Latency vs Gas Used")
-    ax.set_xlabel("Latency")
-    ax.set_ylabel("Gas Used")
-    ax.legend()
-    ax.grid(True)
-    save_plot(fig, "Latency_vs_Gas")
-
-
-# Main Execution (Updated)
 def main():
     folder = './output/blockchain'
     data = load_data(folder)
-    # plot_avg_transactions(data)
-    # plot_avg_gas(data)
     plot_tx_frequency(data)
-    # plot_avg_tx_fee(data)
-    # plot_throughput(data)
-    # plot_latency_distribution(data)
-    # plot_gas_distribution(data)
-    # plot_fee_distribution(data)
-    # plot_cumulative_transactions(data)
-    # plot_latency_vs_gas(data)
+
     print("\n🎯 All graphs stored successfully inside **graphs/blockchain/** folder")
 
 if __name__ == "__main__":

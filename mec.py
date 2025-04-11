@@ -52,7 +52,7 @@ def send_data_to_container(user_data_1, user_data_2, slice_type, updated_latency
 # Process users with a loop
 for frame in range(total_rows):
     user = df.iloc[frame]
-    user_id = user['User_ID']
+    user_id = user['User_ID'].to_dict()
     container_port = int(user['Assigned_Edge_Node'])
     slice_type = str(user['Network_Slice']).strip()
 
@@ -66,6 +66,7 @@ for frame in range(total_rows):
         user_data_1,
         user_data_2,
         slice_type,
+        user_id,
         user['Updated_Latency'],
         user['Signal_Strength'],
         user['Updated_Signal_Strength'],

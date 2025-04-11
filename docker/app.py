@@ -83,7 +83,7 @@ def predict():
     user_data_2 = pd.DataFrame([input_data['user_data_2']])  # Convert JSON to DataFrame
     slice_type = str(input_data['slice_type']).strip()
     updated_latency = input_data['updated_latency']
-    user_id = input_data.get('user_id', '756')
+    user_id = input_data['user_id']
 
     # Step 1: Predict new allocated bandwidth using Model 1
     prediction1 = model1.predict(user_data_1)

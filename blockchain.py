@@ -61,17 +61,7 @@ for block_number in tqdm(range(latest_block + 1), desc="Processing Blocks"):
                     "from": tx["from"],
                     "to": tx["to"],
                     "gas_used": receipt.gasUsed,
-                    "gas_price": tx["gasPrice"],
-                    "transaction_fee": receipt.gasUsed * tx["gasPrice"],
-                    "block_number": block_number,
-                    "block_size": block.size,
-                    "block_gas_used": block.gasUsed,
-                    "gas_efficiency": gas_efficiency,
-                    "block_interval": block_interval,
-                    "throughput": len(block.transactions),
                     "latency": latency,
-                    "tx_size": block.size / len(block.transactions) if len(block.transactions) > 0 else 0,
-                    "avg_gas_price_gwei": tx["gasPrice"] / 1e9,
                     "timestamp": timestamp
                 })
             except:
@@ -96,7 +86,4 @@ print(f"✅ Transactions saved to {file_path}")
 # Summary Stats
 print("\n🔍 Summary Stats:")
 print(f"Throughput (Avg TPS): {df_tx['throughput'].mean():.2f}")
-print(f"Avg Gas Efficiency: {df_tx['gas_efficiency'].mean():.2f}%")
 print(f"Avg Latency: {df_tx['latency'].mean():.2f} sec")
-print(f"Avg Transaction Size: {df_tx['tx_size'].mean():.2f} bytes")
-print(f"Avg Gas Price: {df_tx['avg_gas_price_gwei'].mean():.2f} Gwei")
