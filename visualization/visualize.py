@@ -100,8 +100,7 @@ def calculate_and_save_metrics() -> pd.DataFrame:
         metrics.loc[metrics['Cluster_Count'] == 1, 'Allocated_Bandwidth'] = post_10['Allocated_Bandwidth'].sum()
 
     # CALCULATE THROUGHPUT FOR ALL ROWS
-    # Throughput formula: (Allocated Bandwidth) / (1 + Latency)
-    # We add 1 to latency to avoid division by zero and to account for base transmission time
+    # Throughput formula: (Allocated Bandwidth) / ( Latency)
     for idx, row in metrics.iterrows():
         if pd.notnull(row['Allocated_Bandwidth']) and pd.notnull(row['Latency']):
             metrics.at[idx, 'Throughput'] = row['Allocated_Bandwidth'] / ( row['Latency'])
@@ -146,17 +145,32 @@ def plot_from_consolidated_csv():
         ymin, ymax = ax.get_ylim()
         y_range = ymax - ymin
         offset = y_range * 0.05  # 5% of y-range as offset
+        value_offset = y_range * 0.001  # Additional offset for actual value label
         
-        # Add percentage change annotations
+        # Add percentage change annotations and actual values
         baseline = metrics[metric].iloc[0]
         for i, row in metrics.iterrows():
-            if i == 0:  # Skip baseline
-                continue
-                
-            change = ((row[metric] - baseline) / baseline) * 100
             current_value = row[metric]
             
-            # Corrected placement for Resource Allocation (inside the bar at the top)
+            
+            if inverted:
+                # For inverted metrics, place value at the top
+                ax.text(i, current_value - value_offset, f"{current_value:.1f}", 
+                    ha='center', va='top',
+                    fontsize=16, color='black',
+                    bbox=dict(facecolor='white', alpha=0.8, 
+                            edgecolor='none', pad=1))
+            else:
+                ax.text(i, current_value + value_offset, f"{current_value:.1f}",
+            ha='center', va='bottom',
+            fontsize=16, color='black')
+            
+            if i == 0:  # Skip baseline for percentage change
+                continue
+                
+            change = ((current_value - baseline) / baseline) * 100
+            
+            # Percentage change label placement
             if metric == 'Resource_Allocation':
                 change_text = f"+{change:.1f}%" if change >= 0 else f"{change:.1f}%"
                 label_y = current_value * 0.98  # 98% of bar height to keep text inside
@@ -165,22 +179,16 @@ def plot_from_consolidated_csv():
                         fontsize=16, color='red',
                         bbox=dict(facecolor='white', alpha=0.8, 
                                 edgecolor='none', pad=1))
-            
-            # Corrected placement for Signal Strength (inverted bars, bottom inside the bar)
-            elif inverted:  # For inverted metrics like Signal Strength (higher is better)
-                # Always show positive changes with + sign
-                label_y = current_value + offset  # Position above the bar
+            elif inverted:  # For inverted metrics like Signal Strength
+                label_y = current_value + offset
                 va = 'bottom'
-                change_text = f"+{abs(change):.1f}%"  # Force positive sign for clarity
-                
+                change_text = f"+{abs(change):.1f}%"
                 ax.text(i, label_y, change_text,
                         ha='center', va=va,
                         fontsize=16, color='red',
                         bbox=dict(facecolor='white', alpha=0.8,
                                 edgecolor='none', pad=1))
-            
-            # Default placement for other metrics (Latency, Distance, etc.)
-            else:
+            else:  # Default case
                 if change < 0:
                     label_y = current_value - offset
                     va = 'top'
@@ -192,7 +200,7 @@ def plot_from_consolidated_csv():
                 
                 ax.text(i, label_y, change_text, 
                         ha='center', va=va,
-                        fontsize=18, color='red',
+                        fontsize=16, color='red',
                         bbox=dict(facecolor='white', alpha=0.8, 
                                 edgecolor='none', pad=1))
         
@@ -200,7 +208,7 @@ def plot_from_consolidated_csv():
         plt.tight_layout()
         plt.savefig(os.path.join(output_folder, f"{filename}.png"), dpi=300)
         plt.close()
-        
+    
     def plot_throughput():
         plt.figure(figsize=(10, 7))
         ax = sns.barplot(x='Cluster_Count', y='Throughput', data=metrics, palette="viridis")
@@ -215,15 +223,21 @@ def plot_from_consolidated_csv():
         ymin, ymax = ax.get_ylim()
         y_range = ymax - ymin
         offset = y_range * 0.05  # 5% of y-range as offset
+        value_offset = y_range * 0.02  # Additional offset for actual value label
         
         # Add percentage change annotations with boundary checks
         baseline = metrics['Throughput'].iloc[0]
         for i, row in metrics.iterrows():
+            current_value = row['Throughput']
+            
+            ax.text(i, current_value + value_offset, f"{current_value:.1f}",
+           ha='center', va='bottom',
+           fontsize=15, color='black')
+            
             if i == 0:  # Skip baseline
                 continue
                 
-            change = ((row['Throughput'] - baseline) / baseline) * 100
-            current_value = row['Throughput']
+            change = ((current_value - baseline) / baseline) * 100
             
             # Determine label position with boundary checks
             if change < 0:  # Degradation (label below bar)
@@ -247,6 +261,9 @@ def plot_from_consolidated_csv():
         plt.tight_layout()
         plt.savefig(os.path.join(output_folder, "throughput_comparison.png"), dpi=300)
         plt.close()
+
+
+
     
     # Generate individual plots
     plot_throughput()
@@ -261,37 +278,49 @@ def plot_from_consolidated_csv():
     # Bandwidth plot (special handling for size)
     plt.figure(figsize=(10, 7))
     ax = sns.barplot(x='Cluster_Count', y='Allocated_Bandwidth', data=metrics, palette="viridis")
-    
+
     # Get y-axis limits
     ymin, ymax = ax.get_ylim()
     y_range = ymax - ymin
     offset = y_range * 0.05
-    
-    # Add percentage change annotations
+    value_offset = y_range * 0.001  # Additional offset for actual value label
+
+    # Add percentage change annotations and actual values
     baseline = metrics['Allocated_Bandwidth'].iloc[0]
     for i, row in metrics.iterrows():
+        current_value = row['Allocated_Bandwidth']
+        
+        # Only show value label for first bar in scientific notation
+        if i == 0:
+            ax.text(i, current_value + value_offset, f"{current_value:.2e}",
+                ha='center', va='bottom',
+                fontsize=14, color='black')
+        
         if i == 0:
             continue
-        change = ((row['Allocated_Bandwidth'] - baseline) / baseline) * 100
+        change = ((current_value - baseline) / baseline) * 100
         
         if change < 0:  # Improvement (reduction)
-            label_y = row['Allocated_Bandwidth'] - offset
+            label_y = current_value - offset
             va = 'top'
             change_text = f"{change:+.1f}%"
         else:  # Degradation (increase)
-            label_y = row['Allocated_Bandwidth'] + offset
+            label_y = current_value + offset
             va = 'bottom'
             change_text = f"+{change:.1f}%"
         
         ax.text(i, label_y, change_text, 
-               ha='center', va=va,
-               fontsize=16, color='red',
-               bbox=dict(facecolor='white', alpha=0.8, 
+            ha='center', va=va,
+            fontsize=16, color='red',
+            bbox=dict(facecolor='white', alpha=0.8, 
                         edgecolor='none', pad=1))
-    
+
+    # Format y-axis in scientific notation
+    ax.yaxis.set_major_formatter(plt.FormatStrFormatter('%.1e'))
+
     ax.set(xlabel='Number of Edge Nodes', 
-           ylabel='Total Allocated Bandwidth (KBps)',
-           title='Total Allocated Bandwidth Comparison')
+        ylabel='Total Allocated Bandwidth (KBps)',
+        title='Total Allocated Bandwidth Comparison')
     plt.tight_layout()
     plt.savefig(os.path.join(output_folder, "total_allocated_bandwidth.png"), dpi=300)
     plt.close()

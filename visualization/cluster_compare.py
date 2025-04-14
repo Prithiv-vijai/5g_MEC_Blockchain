@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 from sklearn.metrics import (
-    silhouette_score, davies_bouldin_score, calinski_harabasz_score
+    silhouette_score, calinski_harabasz_score
 )
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -40,24 +40,18 @@ def analyze_results(df, algorithm, n_clusters):
     # Calculate clustering metrics
     if n_clusters > 1:  # Silhouette Score requires at least 2 clusters
         silhouette_avg = silhouette_score(df[['x_coordinate', 'y_coordinate']], df['Cluster'])
-        davies_bouldin = davies_bouldin_score(df[['x_coordinate', 'y_coordinate']], df['Cluster'])
         calinski_harabasz = calinski_harabasz_score(df[['x_coordinate', 'y_coordinate']], df['Cluster'])
     else:
         silhouette_avg = np.nan
-        davies_bouldin = np.nan
         calinski_harabasz = np.nan
 
-    # Calculate execution time
-    execution_time = time.time() - start_time
 
     # Store results
     results['Algorithm'].append(algorithm)
     results['Cluster_Count'].append(n_clusters)
     results['Average_Distance'].append(avg_distance)
     results['Silhouette_Score'].append(silhouette_avg)
-    results['Davies_Bouldin_Index'].append(davies_bouldin)
     results['Calinski_Harabasz_Index'].append(calinski_harabasz)
-    results['Execution_Time'].append(execution_time)
 
 # Function to visualize clusters and save the plot
 def visualize_clusters(df, algorithm, n_clusters):
