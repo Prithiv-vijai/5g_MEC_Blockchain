@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
+import numpy as np
 
 # Fetch environment variables
 input_file = os.environ.get('INPUT_FILE')
@@ -29,30 +30,45 @@ input_columns_1 = ['Application_Type', 'Updated_Signal_Strength', 'Updated_Laten
 input_columns_2 = ['Application_Type','Updated_Signal_Strength', 'Updated_Latency', 'Required_Bandwidth', 'Allocated_Bandwidth']
 executor = ThreadPoolExecutor(max_workers=5)
 
- 
-def send_data_to_container(user_data_1, user_data_2, slice_type, updated_latency, signal_strength, updated_signal_strength, container_port):
+def convert_numpy_types(obj):
+    """Recursively convert numpy types to native Python types."""
+    if isinstance(obj, (np.integer, np.int64)):
+        return int(obj)
+    elif isinstance(obj, (np.floating, np.float64)):
+        return float(obj)
+    elif isinstance(obj, dict):
+        return {k: convert_numpy_types(v) for k, v in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        return [convert_numpy_types(x) for x in obj]
+    return obj
+
+def send_data_to_container(user_data_1, user_data_2, user_id, slice_type, updated_latency, signal_strength, updated_signal_strength, container_port):
     """Send data to container for processing."""
     url = f'http://localhost:{container_port}/predict'
+    
+    # Convert all numpy types to native Python types
     payload = {
-        'user_data_1': user_data_1,
-        'user_data_2': user_data_2,
-        'slice_type': slice_type,
-        'updated_latency': updated_latency,
-        'signal_strength': signal_strength,
-        'updated_signal_strength': updated_signal_strength
+        'user_data_1': convert_numpy_types(user_data_1),
+        'user_data_2': convert_numpy_types(user_data_2),
+        'user_id': convert_numpy_types(user_id),
+        'slice_type': str(slice_type),
+        'updated_latency': convert_numpy_types(updated_latency),
+        'signal_strength': convert_numpy_types(signal_strength),
+        'updated_signal_strength': convert_numpy_types(updated_signal_strength)
     }
+    
     try:
-        response = requests.post(url, json=payload)
+        response = requests.post(url, json=payload, timeout=10)
         response.raise_for_status()
         return response.json()
-    except Exception as e:
-        print(f"Error sending data to container: {e}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error sending data to container {container_port}: {e}")
         return None
 
 # Process users with a loop
 for frame in range(total_rows):
     user = df.iloc[frame]
-    user_id = user['User_ID'].to_dict()
+    user_id = user['User_ID']
     container_port = int(user['Assigned_Edge_Node'])
     slice_type = str(user['Network_Slice']).strip()
 
@@ -65,8 +81,8 @@ for frame in range(total_rows):
         send_data_to_container,
         user_data_1,
         user_data_2,
+        user_id,  # Fixed parameter order - user_id comes before slice_type
         slice_type,
-        user_id,
         user['Updated_Latency'],
         user['Signal_Strength'],
         user['Updated_Signal_Strength'],
@@ -80,8 +96,6 @@ for frame in range(total_rows):
     else:
         new_allocated_bandwidth = 'Error'
         new_resource_allocation = 'Error'
-
-
 
     # Prepare data for CSV
     result_data = {

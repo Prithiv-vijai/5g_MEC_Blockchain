@@ -28,9 +28,9 @@ def restart_docker_containers():
     print("Restarting Docker containers...")
     try:
         # First, stop all containers
-        subprocess.run(["docker-compose", "down"], check=True)
+        subprocess.run(["docker-compose", "down"], check=True,cwd="./docker")
         # Then start them fresh
-        subprocess.run(["docker-compose", "up", "-d"], check=True)
+        subprocess.run(["docker-compose", "up", "-d"], check=True,cwd="./docker")
         print("✅ Docker containers restarted successfully")
         # Give containers some time to initialize
         time.sleep(30)
